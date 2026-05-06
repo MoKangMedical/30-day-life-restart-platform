@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.DS_Store
+.env
+.env.*
+.playwright-mcp/
+tmp/
+output/
+*.log
+
+# Local source materials and screenshots that are not needed for the website build.
+*.pdf
+*.jpg
+*.jpeg
+*.png
+!public/**/*.jpg
+!public/**/*.jpeg
+!public/**/*.png
