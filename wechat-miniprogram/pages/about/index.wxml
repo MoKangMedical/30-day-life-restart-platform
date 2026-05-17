@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">平台说明</text>
+    <text class="hero-subtitle">明确平台定位、数据边界和健康内容边界，递交和用户使用时都更清晰。</text>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">平台定位</text>
+      <text class="section-action">学习工具</text>
+    </view>
+    <text class="muted">本平台用于 30 天课程学习、个人打卡、自我复盘和小组统计，帮助用户建立更稳定的日常行动结构。</text>
+    <text class="notice">平台不承诺固定结果，也不把打卡积分解释为医疗、心理或营养效果。</text>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">数据与隐私</text>
+      <text class="section-action">本地记录</text>
+    </view>
+    <text class="muted">当前版本的打卡、课程进度、小组记录保存在本机微信小程序缓存中，不主动上传服务器。</text>
+    <text class="notice">更换设备、删除小程序或清理缓存后，本地记录可能丢失。正式上线若接入账号、云存储或支付，需要同步更新隐私保护指引。</text>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">健康内容边界</text>
+      <text class="section-action">重要</text>
+    </view>
+    <text class="muted">课程中涉及饮食、睡眠、运动和情绪的内容，属于一般学习和生活方式管理信息，不替代医生、心理咨询师、营养师等专业建议。</text>
+    <text class="notice">如果存在疾病、用药、孕期、严重睡眠问题、持续情绪困扰或运动风险，请先咨询专业人士。</text>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">使用建议</text>
+      <text class="section-action">稳定优先</text>
+    </view>
+    <text class="muted">建议每天固定时间完成打卡，记录真实状态、一个小行动和一次复盘。没做到时也可以记录偏差，不需要为了积分美化结果。</text>
+  </view>
+</view>

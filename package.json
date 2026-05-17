@@ -6,14 +6,19 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "miniprogram:open": "open -a /Applications/wechatwebdevtools.app ./wechat-miniprogram",
+    "miniprogram:check": "find wechat-miniprogram -name '*.js' -print -exec node --check {} \\;",
+    "miniprogram:submit-check": "node scripts/check-miniprogram-submit.cjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.1.0",
-    "vite": "^7.2.7",
+    "lucide-react": "^0.556.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "lucide-react": "^0.556.0"
+    "vite": "^7.2.7"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
 }

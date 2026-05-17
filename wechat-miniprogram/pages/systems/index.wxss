@@ -1,0 +1,68 @@
+.system-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.system-card {
+  width: calc(50% - 8rpx);
+  min-height: 160rpx;
+  padding: 20rpx;
+  text-align: left;
+  background: #fbfaf6;
+  border: 1rpx solid #dfe5df;
+  border-radius: 14rpx;
+}
+
+.system-card.active {
+  background: #e8eef4;
+  border-color: #c7d5e4;
+}
+
+.system-order {
+  display: block;
+  color: #b56d3f;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.system-name {
+  display: block;
+  margin-top: 10rpx;
+  color: #17385b;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.system-duration {
+  display: block;
+  margin-top: 12rpx;
+  color: #5c8f73;
+  font-size: 23rpx;
+}
+
+.meta-row {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 18rpx;
+}
+
+.detail-label {
+  display: block;
+  margin: 22rpx 0 8rpx;
+  color: #17385b;
+  font-size: 27rpx;
+  font-weight: 800;
+}
+
+.training-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.training-item {
+  color: #526060;
+  font-size: 26rpx;
+  line-height: 1.6;
+}

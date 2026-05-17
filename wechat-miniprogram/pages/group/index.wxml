@@ -1,0 +1,59 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">小组场域</text>
+    <text class="hero-subtitle">把课程中的组长统计、积分、补打卡和周复盘机制放进系统。</text>
+  </view>
+
+  <view class="score-grid">
+    <view class="score-card">
+      <text>每日打卡</text>
+      <text>{{score.dailyScore || 0}}</text>
+    </view>
+    <view class="score-card">
+      <text>课程作业</text>
+      <text>{{score.courseScore || 0}}</text>
+    </view>
+    <view class="score-card">
+      <text>小组满勤</text>
+      <text>{{score.groupScore || 0}}</text>
+    </view>
+    <view class="score-card">
+      <text>补打卡</text>
+      <text>{{score.makeupDays || 0}}/3</text>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">今日统计</text>
+      <text class="section-action">Day {{day}}</text>
+    </view>
+    <button class="ghost-btn action-btn" bindtap="toggleGroupFull">{{check.groupFullAttendance ? '取消小组满勤' : '标记小组满勤 +30'}}</button>
+    <button class="ghost-btn action-btn" bindtap="toggleMakeup">{{check.makeup ? '取消补打卡' : '标记为补打卡'}}</button>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">组长后台</text>
+      <text class="section-action">本地记录</text>
+    </view>
+    <text class="field-label">小组名称</text>
+    <input class="input" value="{{group.name || ''}}" data-key="name" bindinput="updateGroup" />
+    <text class="field-label">我的角色</text>
+    <input class="input" value="{{group.role || ''}}" data-key="role" bindinput="updateGroup" />
+    <text class="field-label">成员名单</text>
+    <textarea class="textarea" value="{{group.members || ''}}" data-key="members" bindinput="updateGroup" placeholder="例：奥斯卡、张麟、兔兔、叶媚媚" />
+    <text class="field-label">小组排行记录</text>
+    <textarea class="textarea" value="{{group.leaderboard || ''}}" data-key="leaderboard" bindinput="updateGroup" placeholder="例：一组 260 分；二组 240 分" />
+    <text class="field-label">每周 15 分钟复盘</text>
+    <textarea class="textarea" value="{{group.review || ''}}" data-key="review" bindinput="updateGroup" placeholder="记录有效动作、断点、下周微调。" />
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">组长统计文案</text>
+      <button class="copy-btn" bindtap="copyMessage">复制</button>
+    </view>
+    <textarea class="textarea generated" value="{{message}}" disabled />
+  </view>
+</view>

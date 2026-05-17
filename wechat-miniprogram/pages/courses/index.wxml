@@ -1,0 +1,78 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">人生重启研究院</text>
+    <text class="hero-subtitle">8 个系统课、32 节理论课、24 节书籍转化课、30 天日课打卡。</text>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">4 次核心课</text>
+      <text class="section-action">学习机制</text>
+    </view>
+    <button
+      wx:for="{{coreCourses}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      class="core-row {{item.done ? 'done' : ''}}"
+      bindtap="toggleCoreCourse"
+    >
+      <text>{{item.done ? '✓' : '○'}}</text>
+      <view>
+        <text class="core-title">{{item.title}}</text>
+        <text class="core-body">{{item.week}} · {{item.focus}}</text>
+      </view>
+    </button>
+  </view>
+
+  <view class="panel">
+    <view class="course-tabs">
+      <button
+        wx:for="{{courses}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        class="course-tab {{item.active ? 'active' : ''}}"
+        bindtap="selectCourse"
+      >
+        <text>{{item.order}}</text>
+        <text>{{item.name}}</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">{{activeCourse.name}}</text>
+      <text class="section-action">{{activeCourse.order}}</text>
+    </view>
+    <text class="course-title">{{activeCourse.courseTitle}}</text>
+    <text class="muted">{{activeCourse.positioning}}</text>
+    <text class="outcome-box">{{activeCourse.outcome}}</text>
+
+    <text class="detail-title">理论课程结构</text>
+    <view wx:for="{{activeCourse.lessonViews}}" wx:key="title" class="lesson-card">
+      <text class="lesson-num">{{item.num}}</text>
+      <view>
+        <text class="lesson-title">{{item.title}}</text>
+        <text class="lesson-body">{{item.body}}</text>
+      </view>
+    </view>
+
+    <text class="detail-title">训练方式</text>
+    <text wx:for="{{activeCourse.practiceViews}}" wx:key="*this" class="list-line">• {{item}}</text>
+
+    <text class="detail-title">书籍转化课程</text>
+    <view wx:for="{{activeCourse.bookCourseViews}}" wx:key="title" class="book-course-card">
+      <text class="book-source">{{item.source}}</text>
+      <text class="book-title">{{item.title}}</text>
+      <text class="book-body">作业：{{item.assignment}}</text>
+    </view>
+
+    <text class="detail-title">推荐书目</text>
+    <view wx:for="{{activeCourse.bookViews}}" wx:key="title" class="book-card">
+      <text class="book-title">{{item.title}}</text>
+      <text class="book-body">{{item.body}}</text>
+    </view>
+
+    <button class="primary-btn audio-btn" bindtap="toggleAudio">{{playing ? '暂停语音概要' : '播放语音概要'}}</button>
+  </view>
+</view>

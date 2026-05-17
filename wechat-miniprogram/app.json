@@ -1,0 +1,56 @@
+{
+  "pages": [
+    "pages/dashboard/index",
+    "pages/checkin/index",
+    "pages/systems/index",
+    "pages/courses/index",
+    "pages/group/index",
+    "pages/about/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "30天重建人生体系",
+    "navigationBarBackgroundColor": "#17385b",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f8f5"
+  },
+  "tabBar": {
+    "color": "#7a8584",
+    "selectedColor": "#17385b",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/dashboard/index",
+        "text": "今日",
+        "iconPath": "assets/tab-default.png",
+        "selectedIconPath": "assets/tab-active.png"
+      },
+      {
+        "pagePath": "pages/checkin/index",
+        "text": "打卡",
+        "iconPath": "assets/tab-default.png",
+        "selectedIconPath": "assets/tab-active.png"
+      },
+      {
+        "pagePath": "pages/systems/index",
+        "text": "系统",
+        "iconPath": "assets/tab-default.png",
+        "selectedIconPath": "assets/tab-active.png"
+      },
+      {
+        "pagePath": "pages/courses/index",
+        "text": "课程",
+        "iconPath": "assets/tab-default.png",
+        "selectedIconPath": "assets/tab-active.png"
+      },
+      {
+        "pagePath": "pages/group/index",
+        "text": "小组",
+        "iconPath": "assets/tab-default.png",
+        "selectedIconPath": "assets/tab-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

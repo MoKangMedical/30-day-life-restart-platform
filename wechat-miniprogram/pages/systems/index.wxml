@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">八个个人运行系统</text>
+    <text class="hero-subtitle">原始架构已经转成平台原生内容：系统、价值、周期、难度和训练方式。</text>
+  </view>
+
+  <view class="panel">
+    <view class="system-grid">
+      <button
+        wx:for="{{systems}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        class="system-card {{item.active ? 'active' : ''}}"
+        bindtap="selectSystem"
+      >
+        <text class="system-order">{{item.order}}</text>
+        <text class="system-name">{{item.name}}</text>
+        <text class="system-duration">{{item.duration}}</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">{{activeSystem.name}}</text>
+      <text class="section-action">{{activeSystem.order}}</text>
+    </view>
+    <view class="meta-row">
+      <text class="tag">难度：{{activeSystem.difficulty}}</text>
+      <text class="tag">周期：{{activeSystem.duration}}</text>
+    </view>
+    <text class="detail-label">核心内容</text>
+    <text class="muted">{{activeSystem.content}}</text>
+    <text class="detail-label">价值</text>
+    <text class="muted">{{activeSystem.value}}</text>
+    <text class="detail-label">训练方式</text>
+    <view class="training-list">
+      <text wx:for="{{activeSystem.training}}" wx:key="*this" class="training-item">• {{item}}</text>
+    </view>
+  </view>
+</view>

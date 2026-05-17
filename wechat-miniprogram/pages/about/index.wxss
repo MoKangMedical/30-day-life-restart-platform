@@ -1,0 +1,11 @@
+.notice {
+  display: block;
+  margin-top: 16rpx;
+  padding: 18rpx;
+  color: #8a5a3b;
+  background: #fff4ea;
+  border: 1rpx solid #f0d8c2;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+}

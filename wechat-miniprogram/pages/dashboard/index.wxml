@@ -1,0 +1,240 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">30天重建人生体系</text>
+    <text class="hero-subtitle">从今天开始，把身心能量、节律、目标、反馈、学习、关系、价值和身份重新跑起来。</text>
+  </view>
+
+  <view class="panel engagement-panel">
+    <view class="section-head">
+      <text class="section-title">今日开启仪式</text>
+      <text class="section-action">今天打开就先做这一步</text>
+    </view>
+
+    <view class="engagement-hero">
+      <view class="engagement-copy">
+        <text class="engagement-system">{{engagement.systemName}}</text>
+        <text class="engagement-title">{{engagement.headline}}</text>
+        <text class="engagement-body">{{engagement.body}}</text>
+      </view>
+      <view class="engagement-ring">
+        <text class="engagement-percent">{{engagement.taskPercent}}%</text>
+        <text class="engagement-label">任务进度</text>
+      </view>
+    </view>
+
+    <view class="ritual-grid">
+      <button
+        wx:for="{{engagement.ritualSteps}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        data-disabled="{{item.disabled}}"
+        class="ritual-step {{item.active ? 'active' : ''}} {{item.disabled ? 'disabled' : ''}}"
+        bindtap="tapRitualStep"
+      >
+        <text class="ritual-order">{{item.order}}</text>
+        <text class="ritual-title">{{item.title}}</text>
+        <text class="ritual-body">{{item.body}}</text>
+      </button>
+    </view>
+
+    <view class="intention-box">
+      <text class="field-label compact">今天打开平台，我要保护的一个动作</text>
+      <input
+        class="intention-input"
+        value="{{check.intention || ''}}"
+        bindinput="updateIntention"
+        placeholder="例：今晚 22:00 前完成真实打卡，不失联。"
+      />
+    </view>
+
+    <view class="spark-card {{check.sparkOpened ? 'open' : ''}}">
+      <view class="spark-head">
+        <view>
+          <text class="spark-mark">锦囊</text>
+          <text class="spark-title">{{engagement.sparkTitle}}</text>
+        </view>
+        <button class="spark-btn" bindtap="changeSpark">{{engagement.sparkButton}}</button>
+      </view>
+      <text class="spark-body">{{engagement.sparkBody}}</text>
+      <text class="spark-action">{{engagement.sparkAction}}</text>
+    </view>
+
+    <view class="reward-box">
+      <view class="reward-summary">
+        <text class="reward-title">连续 {{engagement.streak}} 天</text>
+        <text class="reward-body">下一枚：{{engagement.nextRewardTitle}} · 还差 {{engagement.nextRewardLeft}} 天</text>
+      </view>
+      <view class="reward-badges">
+        <text wx:for="{{engagement.rewards}}" wx:key="day" class="reward-badge {{item.earned ? 'earned' : ''}}">{{item.day}}天</text>
+      </view>
+    </view>
+
+    <view class="tomorrow-preview">
+      <text class="preview-label">明日预告</text>
+      <text class="preview-title">Day {{engagement.tomorrow.day}} · {{engagement.tomorrow.title}}</text>
+      <text class="preview-body">{{engagement.tomorrow.lesson}}</text>
+    </view>
+  </view>
+
+  <view class="metrics">
+    <view class="metric-card">
+      <text class="metric-label">30天进度</text>
+      <text class="metric-value">{{score.completedDays || 0}}/30</text>
+    </view>
+    <view class="metric-card">
+      <text class="metric-label">核心课程</text>
+      <text class="metric-value">{{score.completedCourses || 0}}/4</text>
+    </view>
+    <view class="metric-card">
+      <text class="metric-label">积分</text>
+      <text class="metric-value">{{score.totalScore || 0}}</text>
+    </view>
+  </view>
+
+  <view class="panel setup-panel">
+    <view class="section-head compact">
+      <text class="section-title">计划设置</text>
+      <text class="section-action">第 {{activeDay}} 天</text>
+    </view>
+    <picker mode="date" value="{{startDate}}" bindchange="changeStartDate">
+      <view class="date-picker">
+        <text>开始日期</text>
+        <text>{{startDate}}</text>
+      </view>
+    </picker>
+    <text class="helper-text">系统会根据开始日期自动定位 30 天进度；中途加入或重新开营时，可在这里校准。</text>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">30天进度</text>
+      <text class="section-action">第 {{activeDay}} 天</text>
+    </view>
+    <view class="day-grid">
+      <view
+        wx:for="{{programDays}}"
+        wx:key="day"
+        data-day="{{item.day}}"
+        class="day-cell {{item.active ? 'active' : ''}}"
+        bindtap="selectDay"
+      >
+        <text>{{item.day}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">今日打卡</text>
+      <text class="section-action">{{taskDoneCount}}/{{todayProgram.tasks.length}}</text>
+    </view>
+    <text class="tag">{{todayProgram.phase}}</text>
+    <text class="day-title">Day {{todayProgram.day}} · {{todayProgram.title}}</text>
+    <text class="muted">{{todayProgram.lesson}}</text>
+
+    <view class="slider-row">
+      <text>精力 {{check.energy || 3}}</text>
+      <slider min="1" max="5" value="{{check.energy || 3}}" data-key="energy" bindchange="setMetric" activeColor="#5c8f73" />
+    </view>
+    <view class="slider-row">
+      <text>情绪 {{check.mood || 3}}</text>
+      <slider min="1" max="5" value="{{check.mood || 3}}" data-key="mood" bindchange="setMetric" activeColor="#5c8f73" />
+    </view>
+    <view class="slider-row">
+      <text>注意力 {{check.focus || 3}}</text>
+      <slider min="1" max="5" value="{{check.focus || 3}}" data-key="focus" bindchange="setMetric" activeColor="#5c8f73" />
+    </view>
+
+    <view class="task-list">
+      <button
+        wx:for="{{taskRows}}"
+        wx:key="name"
+        data-task="{{item.name}}"
+        class="task-row {{item.done ? 'done' : ''}}"
+        bindtap="toggleTask"
+      >
+        <text>{{item.done ? '✓' : '○'}}</text>
+        <text>{{item.name}}</text>
+      </button>
+    </view>
+
+    <text class="field-label">今日输出：{{todayProgram.output}}</text>
+    <textarea class="textarea" value="{{check.output || ''}}" data-key="output" bindinput="updateText" placeholder="写下今天的真实输出。" />
+
+    <text class="field-label">复盘问题：{{todayProgram.prompt}}</text>
+    <textarea class="textarea" value="{{check.reflection || ''}}" data-key="reflection" bindinput="updateText" placeholder="用几句话回答今天的问题。" />
+
+    <button class="primary-btn complete-btn" bindtap="completeDay">完成今日打卡</button>
+  </view>
+
+  <view class="panel sleep-panel">
+    <view class="section-head">
+      <text class="section-title">饮食 + 睡眠 100 分</text>
+      <text class="section-action">{{sleepTotal}}/100</text>
+    </view>
+    <view class="sleep-hero">
+      <text class="sleep-title">先完整，再适量；先稳定，再优化。</text>
+      <text class="sleep-feedback">{{sleepFeedback}}</text>
+    </view>
+    <view class="sleep-list">
+      <view wx:for="{{sleepRows}}" wx:key="key" class="sleep-item">
+        <view class="sleep-item-head">
+          <text>{{item.group}} · {{item.title}}</text>
+          <text>{{item.value}}/{{item.max}}</text>
+        </view>
+        <text class="sleep-item-body">{{item.full}}</text>
+        <view class="score-options">
+          <button
+            wx:for="{{item.options}}"
+            wx:for-item="option"
+            wx:key="value"
+            data-key="{{item.key}}"
+            data-value="{{option.value}}"
+            class="score-option {{option.active ? 'active' : ''}}"
+            bindtap="setSleepScore"
+          >
+            {{option.label}}
+          </button>
+        </view>
+      </view>
+    </view>
+    <view class="homework-list">
+      <view wx:for="{{sleepHomeworkRows}}" wx:key="key" class="homework-field">
+        <text class="field-label compact">{{item.label}}</text>
+        <textarea class="textarea small" value="{{item.value}}" data-key="{{item.key}}" bindinput="updateSleepHomework" placeholder="写具体、可执行的调整。" />
+      </view>
+    </view>
+  </view>
+
+  <view class="panel kitchen-panel">
+    <view class="section-head">
+      <text class="section-title">厨房系统建模</text>
+      <text class="section-action">{{kitchenDoneCount}}/8</text>
+    </view>
+    <text class="kitchen-thesis">厨房不是做饭的地方，而是家庭的能量供给中心。</text>
+    <text class="muted">目标 × 食材 × 工具 × 流程 × 菜单 × 储存 × 清洁 × 反馈，决定好饭能否每天稳定发生。</text>
+    <view class="kitchen-list">
+      <button wx:for="{{kitchenRows}}" wx:key="key" data-key="{{item.key}}" class="kitchen-row {{item.done ? 'done' : ''}}" bindtap="toggleKitchenAudit">
+        <text>{{item.done ? '✓' : '○'}}</text>
+        <text>{{item.label}}</text>
+      </button>
+    </view>
+    <text class="field-label">我的基础餐/基础组合</text>
+    <textarea class="textarea" value="{{kitchenPlan.menu || ''}}" data-key="menu" bindinput="updateKitchenPlan" placeholder="例：鸡蛋牛奶燕麦；鸡腿紫薯西兰花。" />
+    <text class="field-label">下周厨房系统最小改造</text>
+    <textarea class="textarea" value="{{kitchenPlan.nextStep || ''}}" data-key="nextStep" bindinput="updateKitchenPlan" placeholder="例：周日采购一次，肉类分装，晚饭后 5 分钟复盘。" />
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">平台模块</text>
+      <text class="section-action">进入</text>
+    </view>
+    <view class="nav-grid">
+      <view wx:for="{{navItems}}" wx:key="title" data-url="{{item.url}}" data-tab="{{item.tab}}" class="nav-card" bindtap="go">
+        <text class="nav-card-title">{{item.title}}</text>
+        <text class="nav-card-body">{{item.body}}</text>
+      </view>
+    </view>
+  </view>
+</view>

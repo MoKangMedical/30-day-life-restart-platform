@@ -1,0 +1,39 @@
+<view class="page">
+  <view class="hero">
+    <text class="hero-title">打卡模式</text>
+    <text class="hero-subtitle">把课程里的每日打卡和课程作业，转成能直接发到群里的文案。</text>
+  </view>
+
+  <view class="panel">
+    <view class="tabs">
+      <button
+        wx:for="{{modes}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        class="tab {{item.active ? 'active' : ''}}"
+        bindtap="switchMode"
+      >{{item.title}}</button>
+    </view>
+    <text class="tag">{{activeMode.deadline}}</text>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">{{activeMode.title}}</text>
+      <text class="section-action">Day {{day}}</text>
+    </view>
+    <view wx:for="{{prompts}}" wx:key="key" class="field">
+      <text class="field-title">{{index + 1}}. {{item.label}}</text>
+      <text class="field-helper">{{item.helper}}</text>
+      <textarea class="textarea" value="{{item.value}}" data-key="{{item.key}}" bindinput="updateField" placeholder="写具体、可执行的回答。" />
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-head">
+      <text class="section-title">群发文案</text>
+      <button class="copy-btn" bindtap="copyText">复制</button>
+    </view>
+    <textarea class="textarea generated" value="{{generatedText}}" disabled />
+  </view>
+</view>
