@@ -1,4 +1,4 @@
-const audioBase = "https://newlife30.com/audio/system-courses/";
+const audioBase = "https://newlife30.cn/audio/system-courses/";
 
 const systems = [
   {

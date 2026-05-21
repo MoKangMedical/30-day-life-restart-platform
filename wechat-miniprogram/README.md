@@ -39,7 +39,7 @@ npm run miniprogram:open
 小程序主包只包含代码和课程数据，MP3 走线上 HTTPS：
 
 ```text
-https://newlife30.com/audio/system-courses/
+https://newlife30.cn/audio/system-courses/
 ```
 
 正式发布前，需要在微信小程序后台把对应域名加入合法域名；开发者工具里可以先关闭域名校验调试。

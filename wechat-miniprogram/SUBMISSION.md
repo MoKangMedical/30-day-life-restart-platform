@@ -5,7 +5,7 @@
 - 将 `wechat-miniprogram/project.config.json` 里的 `appid` 从 `touristappid` 替换为真实小程序 AppID。
 - 使用管理员或开发者微信扫码登录微信开发者工具。
 - 在微信公众平台完成“小程序隐私保护指引”配置。
-- 如果语音概要继续使用线上地址，需要把 `https://newlife30.com` 加入合法域名。
+- 如果语音概要继续使用线上地址，需要把 `https://newlife30.cn` 加入合法域名。
 
 ## 本地检查
 
