@@ -1599,6 +1599,9 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             <span>当前推荐系统课</span>
             <strong>{activeCourse.name}</strong>
             <p>{activeCourse.positioning}</p>
+            {activeCourse.goldenQuote && (
+              <blockquote className="academy-golden-quote">{activeCourse.goldenQuote}</blockquote>
+            )}
             <em>{completedLessons}/{activeCourse.lessons.length} 理论课已完成</em>
           </div>
           <div className="academy-stat-grid">
@@ -1709,6 +1712,9 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             <span>{activeCourse.courseTitle}</span>
             <h2>{activeCourse.positioning}</h2>
             <p>{activeCourse.outcome}</p>
+            {activeCourse.goldenQuote && (
+              <blockquote className="course-golden-quote">{activeCourse.goldenQuote}</blockquote>
+            )}
           </div>
 
           <div className="course-progress-band">
