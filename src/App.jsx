@@ -1462,6 +1462,7 @@ function buildLessonBlueprint(course, lessonIndex) {
   const practice = course.practices[lessonIndex] ?? course.outcome;
   const detail = lessonContentDetails[course.id]?.[lessonIndex] ?? {};
   return {
+    quote: detail.quote ?? null,
     objective: `把「${title}」从概念转成今天可使用的判断模型。`,
     model: [
       `识别旧模式：我在「${course.name}」里最常卡住的场景是什么。`,
@@ -1818,6 +1819,13 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             </div>
 
             <div className="lesson-model-grid">
+              {activeLesson.quote && (
+                <div className="lesson-golden-quote">
+                  <span className="lesson-golden-quote-mark">✦</span>
+                  <blockquote>{activeLesson.quote}</blockquote>
+                  <span className="lesson-golden-quote-label">本课金句</span>
+                </div>
+              )}
               {activeLesson.model.map((item, index) => (
                 <article key={item}>
                   <span>{String(index + 1).padStart(2, "0")}</span>

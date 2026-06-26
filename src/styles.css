@@ -1838,9 +1838,71 @@ textarea::placeholder {
 }
 
 .lesson-workbench-head p {
+  font-size: 0.92rem;
+  color: var(--muted);
+  max-width: 580px;
+}
+
+.lesson-golden-quote {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 28px;
+  margin: -8px -8px 20px;
+  background: linear-gradient(135deg, rgba(23, 50, 79, 0.04), rgba(197, 155, 74, 0.08));
+  border: 1px solid rgba(197, 155, 74, 0.2);
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  animation: quoteReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lesson-golden-quote::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, rgba(197, 155, 74, 0.06), transparent 60%);
+  animation: quoteGlow 4s ease-in-out infinite;
+}
+
+@keyframes quoteGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes quoteReveal {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lesson-golden-quote-mark {
+  font-size: 1.1rem;
+  color: var(--gold);
+  opacity: 0.6;
+}
+
+.lesson-golden-quote blockquote {
   margin: 0;
-  color: var(--ink-soft);
-  line-height: 1.65;
+  font-size: 1.22rem;
+  font-weight: 600;
+  color: var(--blue);
+  text-align: center;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  max-width: 500px;
+}
+
+.lesson-golden-quote-label {
+  font-size: 0.75rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
 }
 
 .lesson-complete-btn,
@@ -2247,6 +2309,7 @@ textarea::placeholder {
   color: var(--gold);
   font-size: 34px;
   line-height: 1;
+  animation: statCountIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .academy-stat-card span {
@@ -5947,4 +6010,43 @@ input[type="date"]:focus {
 .course-index-row.active:hover::after,
 .system-orbit-node.active:hover::after {
   opacity: 0.6;
+}
+
+/* === Animated counters, custom scrollbar, page transitions === */
+
+@keyframes statCountIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.8); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.academy-stat-card:nth-child(1) strong { animation-delay: 0.05s; }
+.academy-stat-card:nth-child(2) strong { animation-delay: 0.12s; }
+.academy-stat-card:nth-child(3) strong { animation-delay: 0.19s; }
+.academy-stat-card:nth-child(4) strong { animation-delay: 0.26s; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(23, 50, 79, 0.15);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(23, 50, 79, 0.28);
+}
+
+/* Page transition animation */
+.main-content > * {
+  animation: pageEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
