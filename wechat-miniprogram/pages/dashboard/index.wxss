@@ -16,7 +16,7 @@
   display: flex;
   gap: 18rpx;
   padding: 24rpx;
-  background: #e8eef4;
+  background: #eef3f7;
   border: 1rpx solid rgba(23, 56, 91, 0.16);
   border-radius: 16rpx;
 }
@@ -28,7 +28,7 @@
 
 .engagement-system {
   display: block;
-  color: #5c8f73;
+  color: #4f8065;
   font-size: 24rpx;
   font-weight: 800;
 }
@@ -36,7 +36,7 @@
 .engagement-title {
   display: block;
   margin-top: 12rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 40rpx;
   font-weight: 800;
   line-height: 1.22;
@@ -45,7 +45,7 @@
 .engagement-body {
   display: block;
   margin-top: 12rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 25rpx;
   line-height: 1.6;
 }
@@ -64,7 +64,7 @@
 }
 
 .engagement-percent {
-  color: #17385b;
+  color: #17324f;
   font-size: 46rpx;
   font-weight: 800;
   line-height: 1;
@@ -72,7 +72,7 @@
 
 .engagement-label {
   margin-top: 12rpx;
-  color: #7a8584;
+  color: #879190;
   font-size: 22rpx;
 }
 
@@ -88,13 +88,13 @@
   min-height: 142rpx;
   padding: 18rpx;
   text-align: left;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
   border-radius: 14rpx;
 }
 
 .ritual-step.active {
-  background: #e7f1e9;
+  background: #edf5ef;
   border-color: rgba(92, 143, 115, 0.36);
 }
 
@@ -104,7 +104,7 @@
 
 .ritual-order {
   display: block;
-  color: #b56d3f;
+  color: #a35f36;
   font-size: 21rpx;
   font-weight: 800;
 }
@@ -112,7 +112,7 @@
 .ritual-title {
   display: block;
   margin-top: 8rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 28rpx;
   font-weight: 800;
 }
@@ -120,7 +120,7 @@
 .ritual-body {
   display: block;
   margin-top: 6rpx;
-  color: #7a8584;
+  color: #879190;
   font-size: 22rpx;
   line-height: 1.45;
 }
@@ -137,9 +137,9 @@
   width: 100%;
   min-height: 78rpx;
   padding: 0 20rpx;
-  color: #1d2b2c;
+  color: #172526;
   background: #ffffff;
-  border: 1rpx solid #dfe5df;
+  border: 1rpx solid #e4e9e4;
   border-radius: 12rpx;
   font-size: 26rpx;
 }
@@ -147,7 +147,7 @@
 .spark-card {
   margin-top: 18rpx;
   padding: 22rpx;
-  background: #fbfaf6;
+  background: #f6f8f6;
   border: 1rpx dashed rgba(181, 109, 63, 0.42);
   border-radius: 16rpx;
 }
@@ -166,7 +166,7 @@
 
 .spark-mark {
   display: block;
-  color: #b56d3f;
+  color: #a35f36;
   font-size: 22rpx;
   font-weight: 800;
 }
@@ -174,7 +174,7 @@
 .spark-title {
   display: block;
   margin-top: 6rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 30rpx;
   font-weight: 800;
 }
@@ -185,7 +185,7 @@
   min-height: 60rpx;
   padding: 0 18rpx;
   color: #ffffff;
-  background: #17385b;
+  background: #17324f;
   border-radius: 10rpx;
   font-size: 24rpx;
   font-weight: 800;
@@ -195,13 +195,13 @@
 .spark-action {
   display: block;
   margin-top: 14rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 25rpx;
   line-height: 1.65;
 }
 
 .spark-action {
-  color: #5c8f73;
+  color: #4f8065;
   font-weight: 800;
 }
 
@@ -212,7 +212,7 @@
   gap: 18rpx;
   margin-top: 18rpx;
   padding: 20rpx;
-  background: #e7f1e9;
+  background: #edf5ef;
   border: 1rpx solid rgba(92, 143, 115, 0.28);
   border-radius: 16rpx;
 }
@@ -224,7 +224,7 @@
 
 .reward-title {
   display: block;
-  color: #17385b;
+  color: #17324f;
   font-size: 29rpx;
   font-weight: 800;
 }
@@ -232,7 +232,7 @@
 .reward-body {
   display: block;
   margin-top: 6rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 23rpx;
   line-height: 1.45;
 }
@@ -251,7 +251,7 @@
   justify-content: center;
   min-height: 46rpx;
   padding: 0 14rpx;
-  color: #7a8584;
+  color: #879190;
   background: rgba(255, 255, 255, 0.62);
   border: 1rpx solid rgba(122, 133, 132, 0.22);
   border-radius: 999rpx;
@@ -260,7 +260,7 @@
 }
 
 .reward-badge.earned {
-  color: #5c8f73;
+  color: #4f8065;
   background: #ffffff;
   border-color: rgba(92, 143, 115, 0.34);
 }
@@ -269,13 +269,13 @@
   margin-top: 18rpx;
   padding: 20rpx;
   background: #ffffff;
-  border: 1rpx solid #dfe5df;
+  border: 1rpx solid #e4e9e4;
   border-radius: 16rpx;
 }
 
 .preview-label {
   display: block;
-  color: #5c8f73;
+  color: #4f8065;
   font-size: 23rpx;
   font-weight: 800;
 }
@@ -283,7 +283,7 @@
 .preview-title {
   display: block;
   margin-top: 8rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 29rpx;
   font-weight: 800;
 }
@@ -291,7 +291,7 @@
 .preview-body {
   display: block;
   margin-top: 8rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 25rpx;
   line-height: 1.6;
 }
@@ -306,9 +306,9 @@
   justify-content: space-between;
   min-height: 78rpx;
   padding: 0 20rpx;
-  color: #17385b;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
+  color: #17324f;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
   border-radius: 12rpx;
   font-size: 26rpx;
   font-weight: 800;
@@ -317,7 +317,7 @@
 .helper-text {
   display: block;
   margin-top: 12rpx;
-  color: #7a8584;
+  color: #879190;
   font-size: 23rpx;
   line-height: 1.55;
 }
@@ -327,20 +327,20 @@
   min-width: 0;
   padding: 22rpx;
   background: #ffffff;
-  border: 1rpx solid #dfe5df;
+  border: 1rpx solid #e4e9e4;
   border-radius: 16rpx;
 }
 
 .metric-label {
   display: block;
-  color: #7a8584;
+  color: #879190;
   font-size: 22rpx;
 }
 
 .metric-value {
   display: block;
   margin-top: 10rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 40rpx;
   font-weight: 800;
 }
@@ -357,9 +357,9 @@
   height: 60rpx;
   min-width: 0;
   margin: 0 10rpx 10rpx 0;
-  color: #526060;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
+  color: #4f5c5b;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
   border-radius: 10rpx;
   font-size: 24rpx;
   font-weight: 700;
@@ -368,13 +368,13 @@
 
 .day-cell.active {
   color: #ffffff;
-  background: #17385b;
+  background: #17324f;
 }
 
 .day-title {
   display: block;
   margin: 16rpx 0 10rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 34rpx;
   font-weight: 800;
   line-height: 1.3;
@@ -382,7 +382,7 @@
 
 .slider-row {
   margin-top: 20rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 26rpx;
 }
 
@@ -396,23 +396,23 @@
   width: 100%;
   padding: 20rpx;
   margin-bottom: 12rpx;
-  color: #526060;
+  color: #4f5c5b;
   text-align: left;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
   border-radius: 12rpx;
   font-size: 26rpx;
 }
 
 .task-row.done {
-  color: #5c8f73;
-  background: #e7f1e9;
+  color: #4f8065;
+  background: #edf5ef;
 }
 
 .field-label {
   display: block;
   margin: 20rpx 0 10rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 26rpx;
   font-weight: 800;
 }
@@ -423,14 +423,14 @@
 
 .sleep-hero {
   padding: 22rpx;
-  background: #e8eef4;
+  background: #eef3f7;
   border: 1rpx solid rgba(23, 56, 91, 0.16);
   border-radius: 14rpx;
 }
 
 .sleep-title {
   display: block;
-  color: #17385b;
+  color: #17324f;
   font-size: 32rpx;
   font-weight: 800;
   line-height: 1.35;
@@ -439,7 +439,7 @@
 .sleep-feedback {
   display: block;
   margin-top: 10rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 25rpx;
   line-height: 1.55;
 }
@@ -453,8 +453,8 @@
 .sleep-item {
   padding: 20rpx;
   margin-bottom: 14rpx;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
   border-radius: 14rpx;
 }
 
@@ -462,7 +462,7 @@
   display: flex;
   justify-content: space-between;
   gap: 18rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 27rpx;
   font-weight: 800;
 }
@@ -470,7 +470,7 @@
 .sleep-item-body {
   display: block;
   margin-top: 8rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 24rpx;
   line-height: 1.5;
 }
@@ -484,9 +484,9 @@
 .score-option {
   flex: 1;
   min-height: 62rpx;
-  color: #526060;
+  color: #4f5c5b;
   background: #ffffff;
-  border: 1rpx solid #dfe5df;
+  border: 1rpx solid #e4e9e4;
   border-radius: 10rpx;
   font-size: 24rpx;
   font-weight: 800;
@@ -494,8 +494,8 @@
 
 .score-option.active {
   color: #ffffff;
-  background: #17385b;
-  border-color: #17385b;
+  background: #17324f;
+  border-color: #17324f;
 }
 
 .homework-field {
@@ -513,7 +513,7 @@
 .kitchen-thesis {
   display: block;
   margin-bottom: 12rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 32rpx;
   font-weight: 800;
   line-height: 1.35;
@@ -525,18 +525,18 @@
   width: 100%;
   padding: 20rpx;
   margin-bottom: 12rpx;
-  color: #526060;
+  color: #4f5c5b;
   text-align: left;
   background: #ffffff;
-  border: 1rpx solid #dfe5df;
+  border: 1rpx solid #e4e9e4;
   border-radius: 12rpx;
   font-size: 25rpx;
   line-height: 1.45;
 }
 
 .kitchen-row.done {
-  color: #5c8f73;
-  background: #e7f1e9;
+  color: #4f8065;
+  background: #edf5ef;
   border-color: rgba(92, 143, 115, 0.32);
 }
 

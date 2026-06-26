@@ -17,6 +17,7 @@ import {
   Headphones,
   LineChart,
   MessageCircle,
+  MonitorPlay,
   Moon,
   NotebookPen,
   RefreshCw,
@@ -178,6 +179,32 @@ const rewardMilestones = [
   { day: 21, title: "升级徽章", body: "学习和复盘正在变成能力。" },
   { day: 30, title: "重启徽章", body: "你完成了一轮个人运行系统重建。" },
 ];
+
+const promoVideoScenes = [
+  {
+    title: "打开后先知道今天做什么",
+    body: "首页给出下一步动作，不要求用户先理解完整体系。",
+  },
+  {
+    title: "每天完成打卡与复盘",
+    body: "从承诺、任务、输出到睡眠饮食评分，形成可记录闭环。",
+  },
+  {
+    title: "课程和书籍变成行动",
+    body: "8 个系统、32 节课、24 节书籍转化课，都对应具体作业。",
+  },
+];
+
+const promoVideoScript = [
+  "欢迎来到 30 天重建人生体系。",
+  "这个平台不是让你收藏更多知识，而是每天告诉你下一步该做什么。",
+  "你会从今日行动台开始：确认承诺、开启今天、完成最小任务、写下输出和复盘。",
+  "如果身体状态不稳，可以进入睡眠饮食评分，找到明天最值得优化的一步。",
+  "如果想系统学习，可以进入 8 个个人运行系统课程：身心、节律、目标、反馈、学习、关系、价值和身份。",
+  "每节课都有讲义、案例、误区、步骤和作业；热门书籍也会被转化成可以执行的训练。",
+  "小组打卡、积分、补卡和群发文案，会帮助你保持不断线。",
+  "30 天后，你留下的不是一堆打卡记录，而是一套能继续运行的人生系统。",
+].join("\n");
 
 function useStoredState() {
   const [state, setState] = useState(() => {
@@ -620,6 +647,12 @@ function App() {
             taskTotal={taskTotal}
             streak={streak}
             onNextAction={handleNextAction}
+            navigateToView={navigateToView}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <PromoVideoPanel
             navigateToView={navigateToView}
           />
         )}
@@ -1202,6 +1235,60 @@ function UserPathPanel({
         <button onClick={() => scrollToId("today-checkin")}>今日打卡</button>
         <button onClick={() => navigateToView("nutrition", "sleep-score")}>睡眠饮食</button>
         <button onClick={() => navigateToView("courses", "system-course-detail")}>继续上课</button>
+      </div>
+    </section>
+  );
+}
+
+function PromoVideoPanel({ navigateToView }) {
+  const [copied, setCopied] = useState(false);
+
+  const copyScript = async () => {
+    try {
+      await navigator.clipboard.writeText(promoVideoScript);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <section className="panel promo-video-panel" aria-label="平台介绍视频">
+      <div className="promo-video-copy">
+        <span>60 秒了解平台</span>
+        <h2>先看清系统，再开始今天</h2>
+        <p>
+          用一支简短介绍片，让新用户进入平台后马上知道：今天做什么、课程在哪里、
+          打卡如何完成，以及 30 天结束后会留下什么。
+        </p>
+        <div className="promo-video-actions">
+          <button onClick={copyScript}>
+            <Copy size={16} />
+            {copied ? "脚本已复制" : "复制视频脚本"}
+          </button>
+          <button onClick={() => navigateToView("courses", "system-course-detail")}>
+            <BookOpen size={16} />
+            查看课程体系
+          </button>
+        </div>
+      </div>
+
+      <div className="promo-video-stage">
+        <div className="promo-video-frame">
+          <MonitorPlay size={34} />
+          <strong>平台介绍视频</strong>
+          <span>HeyGen 授权恢复后可直接生成并嵌入</span>
+        </div>
+        <div className="promo-scene-list">
+          {promoVideoScenes.map((scene, index) => (
+            <article key={scene.title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{scene.title}</strong>
+              <p>{scene.body}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -9,19 +9,19 @@
   min-height: 160rpx;
   padding: 20rpx;
   text-align: left;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
   border-radius: 14rpx;
 }
 
 .system-card.active {
-  background: #e8eef4;
-  border-color: #c7d5e4;
+  background: #eef3f7;
+  border-color: #d7e1ea;
 }
 
 .system-order {
   display: block;
-  color: #b56d3f;
+  color: #a35f36;
   font-size: 22rpx;
   font-weight: 800;
 }
@@ -29,7 +29,7 @@
 .system-name {
   display: block;
   margin-top: 10rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 30rpx;
   font-weight: 800;
 }
@@ -37,7 +37,7 @@
 .system-duration {
   display: block;
   margin-top: 12rpx;
-  color: #5c8f73;
+  color: #4f8065;
   font-size: 23rpx;
 }
 
@@ -50,7 +50,7 @@
 .detail-label {
   display: block;
   margin: 22rpx 0 8rpx;
-  color: #17385b;
+  color: #17324f;
   font-size: 27rpx;
   font-weight: 800;
 }
@@ -62,7 +62,7 @@
 }
 
 .training-item {
-  color: #526060;
+  color: #4f5c5b;
   font-size: 26rpx;
   line-height: 1.6;
 }

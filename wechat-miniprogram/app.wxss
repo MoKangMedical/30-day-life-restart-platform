@@ -1,7 +1,7 @@
 page {
   min-height: 100vh;
-  color: #1d2b2c;
-  background: #f7f8f5;
+  color: #172526;
+  background: #f8faf8;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
@@ -31,13 +31,15 @@ button::after {
 
 .hero {
   padding: 30rpx;
-  color: #ffffff;
-  background: #17385b;
-  border-radius: 16rpx;
+  color: #172526;
+  background: #ffffff;
+  border: 1rpx solid #e4e9e4;
+  border-radius: 14rpx;
 }
 
 .hero-title {
   display: block;
+  color: #17324f;
   font-size: 44rpx;
   font-weight: 800;
   line-height: 1.2;
@@ -46,7 +48,7 @@ button::after {
 .hero-subtitle {
   display: block;
   margin-top: 14rpx;
-  color: #d9e8df;
+  color: #4f5c5b;
   font-size: 26rpx;
   line-height: 1.55;
 }
@@ -55,9 +57,8 @@ button::after {
   padding: 26rpx;
   margin-top: 22rpx;
   background: #ffffff;
-  border: 1rpx solid #dfe5df;
-  border-radius: 16rpx;
-  box-shadow: 0 16rpx 44rpx rgba(29, 43, 44, 0.06);
+  border: 1rpx solid #e4e9e4;
+  border-radius: 14rpx;
 }
 
 .section-head {
@@ -66,22 +67,22 @@ button::after {
   justify-content: space-between;
   padding-bottom: 18rpx;
   margin-bottom: 20rpx;
-  border-bottom: 1rpx solid #dfe5df;
+  border-bottom: 1rpx solid #e4e9e4;
 }
 
 .section-title {
-  color: #17385b;
+  color: #17324f;
   font-size: 32rpx;
   font-weight: 800;
 }
 
 .section-action {
-  color: #7a8584;
+  color: #879190;
   font-size: 24rpx;
 }
 
 .muted {
-  color: #526060;
+  color: #4f5c5b;
   font-size: 26rpx;
   line-height: 1.65;
 }
@@ -89,8 +90,8 @@ button::after {
 .tag {
   display: inline-flex;
   padding: 8rpx 14rpx;
-  color: #5c8f73;
-  background: #e7f1e9;
+  color: #4f8065;
+  background: #edf5ef;
   border-radius: 10rpx;
   font-size: 22rpx;
   font-weight: 700;
@@ -103,8 +104,8 @@ button::after {
   min-height: 82rpx;
   padding: 0 24rpx;
   color: #ffffff;
-  background: #17385b;
-  border-radius: 12rpx;
+  background: #17324f;
+  border-radius: 10rpx;
   font-size: 28rpx;
   font-weight: 800;
 }
@@ -115,9 +116,10 @@ button::after {
   justify-content: center;
   min-height: 74rpx;
   padding: 0 22rpx;
-  color: #17385b;
-  background: #e8eef4;
-  border-radius: 12rpx;
+  color: #17324f;
+  background: #eef3f7;
+  border: 1rpx solid #e4e9e4;
+  border-radius: 10rpx;
   font-size: 26rpx;
   font-weight: 700;
 }
@@ -126,10 +128,10 @@ button::after {
   width: 100%;
   min-height: 150rpx;
   padding: 20rpx;
-  color: #1d2b2c;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
-  border-radius: 12rpx;
+  color: #172526;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
+  border-radius: 10rpx;
   font-size: 26rpx;
   line-height: 1.6;
 }
@@ -145,9 +147,9 @@ button::after {
   padding: 22rpx;
   margin: 0 18rpx 18rpx 0;
   text-align: left;
-  background: #fbfaf6;
-  border: 1rpx solid #dfe5df;
-  border-radius: 14rpx;
+  background: #ffffff;
+  border: 1rpx solid #e4e9e4;
+  border-radius: 10rpx;
   vertical-align: top;
 }
 
@@ -157,7 +159,7 @@ button::after {
 
 .nav-card-title {
   display: block;
-  color: #17385b;
+  color: #17324f;
   font-size: 29rpx;
   font-weight: 800;
 }
@@ -165,7 +167,7 @@ button::after {
 .nav-card-body {
   display: block;
   margin-top: 10rpx;
-  color: #526060;
+  color: #4f5c5b;
   font-size: 23rpx;
   line-height: 1.45;
 }

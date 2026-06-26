@@ -651,6 +651,136 @@ h1 {
   font-weight: 800;
 }
 
+.promo-video-panel {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.78fr) minmax(440px, 1fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.promo-video-copy {
+  display: grid;
+  align-content: center;
+  min-height: 250px;
+}
+
+.promo-video-copy > span {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.promo-video-copy h2 {
+  margin: 10px 0 12px;
+  color: var(--blue);
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.promo-video-copy p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.75;
+}
+
+.promo-video-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.promo-video-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px;
+  color: var(--blue);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.promo-video-actions button:first-child {
+  color: #ffffff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.promo-video-stage {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(210px, 0.78fr);
+  gap: 12px;
+}
+
+.promo-video-frame {
+  display: grid;
+  place-items: center;
+  min-height: 250px;
+  padding: 22px;
+  color: var(--blue);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.promo-video-frame svg {
+  color: var(--green);
+}
+
+.promo-video-frame strong {
+  display: block;
+  margin-top: 12px;
+  color: var(--blue);
+  font-size: 21px;
+}
+
+.promo-video-frame span {
+  display: block;
+  max-width: 240px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.promo-scene-list {
+  display: grid;
+  gap: 10px;
+}
+
+.promo-scene-list article {
+  min-width: 0;
+  padding: 13px;
+  background: var(--paper-soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.promo-scene-list span {
+  color: var(--clay);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.promo-scene-list strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--blue);
+  line-height: 1.35;
+}
+
+.promo-scene-list p {
+  margin: 6px 0 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .engagement-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 142px;
@@ -3269,6 +3399,176 @@ dd p {
   line-height: 1.7;
 }
 
+/* Minimal product skin */
+:root {
+  --bg: #f8faf8;
+  --paper: #ffffff;
+  --paper-soft: #f6f8f6;
+  --ink: #172526;
+  --ink-soft: #4f5c5b;
+  --muted: #879190;
+  --line: #e4e9e4;
+  --blue: #17324f;
+  --blue-soft: #eef3f7;
+  --green: #4f8065;
+  --green-soft: #edf5ef;
+  --clay: #a35f36;
+  --clay-soft: #f6ece4;
+  --gold: #b88d3e;
+  --shadow: none;
+  --radius: 8px;
+  font-family: "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  background: var(--bg);
+}
+
+.sidebar,
+.panel,
+.metric-card,
+.course-index-row,
+.course-lesson-card,
+.book-card,
+.book-course-card,
+.lesson-library-card,
+.book-library-system,
+.book-library-row,
+.system-card,
+.group-stat-card,
+.source-card span,
+.source-card strong,
+.source-card em {
+  box-shadow: none;
+}
+
+.brand-mark {
+  box-shadow: none;
+}
+
+.primary-action {
+  box-shadow: none;
+}
+
+.panel {
+  background: var(--paper);
+}
+
+.metric-card::after {
+  display: none;
+}
+
+.metric-card {
+  min-height: 118px;
+}
+
+.metric-card span {
+  margin-top: 14px;
+}
+
+.user-path-panel,
+.academy-hero-panel {
+  background: var(--paper);
+}
+
+.academy-hero-panel {
+  color: var(--ink);
+}
+
+.academy-hero-copy span,
+.academy-stat-card strong {
+  color: var(--green);
+}
+
+.academy-hero-copy h2,
+.academy-stat-card span {
+  color: var(--blue);
+}
+
+.academy-hero-copy p,
+.academy-stat-card p {
+  color: var(--ink-soft);
+}
+
+.academy-stat-card {
+  background: var(--paper-soft);
+  border-color: var(--line);
+}
+
+.course-hero-block,
+.next-action-card,
+.engagement-hero,
+.sleep-score-hero,
+.kitchen-hero {
+  background: var(--blue-soft);
+  border: 1px solid rgba(23, 50, 79, 0.12);
+}
+
+.course-hero-block,
+.next-action-card {
+  color: var(--ink);
+}
+
+.course-hero-block span,
+.next-action-card > span {
+  color: var(--green);
+}
+
+.course-hero-block h2,
+.next-action-card strong {
+  color: var(--blue);
+}
+
+.course-hero-block p,
+.next-action-card p {
+  color: var(--ink-soft);
+}
+
+.next-action-card button {
+  color: #ffffff;
+  background: var(--blue);
+}
+
+.daily-spark-card,
+.lesson-workbench,
+.course-action-plan,
+.sleep-feedback-box,
+.kitchen-hero {
+  background: var(--paper-soft);
+}
+
+.reward-row,
+.path-progress-card,
+.user-step-card,
+.lesson-lecture-card,
+.lesson-case-card,
+.lesson-prompt-list,
+.lesson-output-card,
+.generated-course-share {
+  background: #ffffff;
+}
+
+.nav-pill.active,
+.course-index-row.active,
+.course-lesson-card.active,
+.lesson-library-card.active,
+.system-card.active,
+.book-course-card.active {
+  background: var(--blue-soft);
+  border-color: rgba(23, 50, 79, 0.2);
+}
+
+.system-link.active,
+.user-step-card.done,
+.course-lesson-card.done,
+.lesson-library-card.done,
+.book-course-card.done,
+.book-library-row.done,
+.pledge-button.accepted {
+  background: var(--green-soft);
+  border-color: rgba(79, 128, 101, 0.22);
+}
+
 @media (max-width: 1180px) {
   .app {
     grid-template-columns: minmax(0, 1fr);
@@ -3381,6 +3681,8 @@ dd p {
   .stats-row,
   .user-path-panel,
   .user-step-grid,
+  .promo-video-panel,
+  .promo-video-stage,
   .engagement-hero,
   .ritual-step-grid,
   .state-sliders,

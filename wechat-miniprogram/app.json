@@ -9,13 +9,13 @@
   ],
   "window": {
     "navigationBarTitleText": "30天重建人生体系",
-    "navigationBarBackgroundColor": "#17385b",
+    "navigationBarBackgroundColor": "#17324f",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#f7f8f5"
+    "backgroundColor": "#f8faf8"
   },
   "tabBar": {
-    "color": "#7a8584",
-    "selectedColor": "#17385b",
+    "color": "#879190",
+    "selectedColor": "#17324f",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
