@@ -206,6 +206,75 @@ const systemOrbitPositions = [
   [24, 22],
 ];
 
+const systemMapLayers = [
+  {
+    label: "底盘稳定层",
+    systems: "身心能量 · 节律秩序",
+    body: "先把身体、睡眠、作息和执行环境稳定下来，让改变有承载力。",
+  },
+  {
+    label: "行动闭环层",
+    systems: "目标行动 · 反馈进化",
+    body: "把模糊愿望拆成当天动作，再用复盘修正判断和下一步。",
+  },
+  {
+    label: "认知外化层",
+    systems: "认知学习 · 沟通关系",
+    body: "把知识变成模型，把模型变成表达、协作和真实影响力。",
+  },
+  {
+    label: "长期方向层",
+    systems: "价值资源 · 身份意义",
+    body: "用价值排序和身份承诺决定做什么、不做什么，以及为什么持续做。",
+  },
+];
+
+const academyBoutiqueTracks = [
+  {
+    label: "Core Studio",
+    title: "系统核心课",
+    body: "每个系统 4 节理论课，按问题、模型、案例、作业组织，适合从零建立方法论。",
+    metric: "8 个系统 · 32 节课",
+    target: "lesson-workbench",
+  },
+  {
+    label: "Book Lab",
+    title: "书籍转化课",
+    body: "把热门书籍中的模型转成课程作业，不做读书摘抄，只保留可执行训练。",
+    metric: "24 节精读转化",
+    target: "book-course-library",
+  },
+  {
+    label: "Daily Lab",
+    title: "日课实验室",
+    body: "每天用打卡、锦囊、徽章和群发作业完成一次小实验，让学习进入真实生活。",
+    metric: "30 天训练闭环",
+    target: "course-action-plan",
+  },
+];
+
+const brandVisualGuidelines = {
+  palette: [
+    ["Midnight Blue", "#102936", "主视觉、按钮、深色仪式区"],
+    ["Institute Navy", "#17324f", "标题、导航、课程重点"],
+    ["Sage Green", "#4f8065", "成长、完成、正向反馈"],
+    ["Champagne", "#efe2c8", "高端点缀、徽章、关键行动"],
+    ["Porcelain", "#fbfcfa", "页面底色、留白区域"],
+  ],
+  principles: [
+    ["一屏一个主行动", "首屏只强化今日要做什么，其余信息向下展开。"],
+    ["系统感大于装饰感", "视觉资产优先表达八大系统、路径、闭环，而不是堆叠卡片。"],
+    ["深色用于仪式感", "只有重启舱、研究院、关键定义区使用深色，避免全站压抑。"],
+    ["浅色用于长期使用", "打卡、课程、输入、复盘保持安静清晰，适合每天打开。"],
+  ],
+  components: [
+    ["Reset Cabin", "深色主视觉、今日指令、阶段卡、闭环进度。"],
+    ["System Orbit", "八大系统图谱、中心核心、四层解释、当前系统定义。"],
+    ["Institute Shelf", "精品课程陈列、研究院路径、系统课和书籍课入口。"],
+    ["Ritual Flow", "开启、锦囊、徽章、明日预告形成连续体验。"],
+  ],
+};
+
 const promoVideoScript = [
   "欢迎来到 30 天重建人生体系。",
   "这个平台不是让你收藏更多知识，而是每天告诉你下一步该做什么。",
@@ -870,6 +939,10 @@ function App() {
             <section className="panel systems-table system-orbit-panel">
               <SectionTitle icon={LineChart} title="八大个人运行系统图谱" action="从状态到身份" />
               <div className="system-orbit-map">
+                <div className="orbit-label orbit-label-top">身份锚点</div>
+                <div className="orbit-label orbit-label-right">行动闭环</div>
+                <div className="orbit-label orbit-label-bottom">底盘恢复</div>
+                <div className="orbit-label orbit-label-left">价值排序</div>
                 <div className="system-orbit-core">
                   <span>OPERATING SYSTEM</span>
                   <strong>8</strong>
@@ -899,6 +972,15 @@ function App() {
               <div className="architecture-note">
                 <strong>架构已平台化</strong>
                 <p>原始理念已经转化为可学习、可打卡、可复盘的八大系统，不再只停留在一张说明图。</p>
+              </div>
+              <div className="system-layer-grid">
+                {systemMapLayers.map((layer) => (
+                  <article key={layer.label}>
+                    <span>{layer.label}</span>
+                    <strong>{layer.systems}</strong>
+                    <p>{layer.body}</p>
+                  </article>
+                ))}
               </div>
             </section>
 
@@ -1531,6 +1613,24 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
         </div>
       </section>
 
+      <section className="panel academy-curation-panel">
+        <SectionTitle icon={Sparkles} title="精品课程陈列" action="像研究院一样组织学习" />
+        <div className="academy-curation-grid">
+          {academyBoutiqueTracks.map((track) => (
+            <article key={track.title} className="academy-curation-card">
+              <span>{track.label}</span>
+              <strong>{track.title}</strong>
+              <p>{track.body}</p>
+              <em>{track.metric}</em>
+              <button onClick={() => selectCourse(activeCourse.id, activeLessonIndex, track.target)}>
+                进入模块
+                <ChevronRight size={16} />
+              </button>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="panel academy-method-panel">
         <SectionTitle icon={Compass} title="课程转化方法" action="模型 -> 作业 -> 反馈" />
         <div className="academy-method-grid">
@@ -2002,6 +2102,55 @@ function TheoryView() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="panel theory-wide brand-guidelines-panel" id="brand-guidelines">
+        <SectionTitle icon={Sparkles} title="newlife30 高端品牌视觉规范" action="视觉资产 v1" />
+        <div className="brand-guideline-hero">
+          <div>
+            <span>Brand System</span>
+            <h2>克制、系统、可持续的高端个人成长平台</h2>
+            <p>
+              newlife30 的视觉不是“打卡工具”，而是“个人运行系统”的可视化：
+              深色建立仪式感，浅色承载长期使用，香槟色只用于关键行动和成就。
+            </p>
+          </div>
+          <a href={assetPath("/brand/newlife30-brand-guidelines.md")} target="_blank" rel="noreferrer">
+            打开完整规范
+          </a>
+        </div>
+
+        <div className="brand-palette-grid">
+          {brandVisualGuidelines.palette.map(([name, color, usage]) => (
+            <article key={name} className="brand-swatch-card">
+              <i style={{ background: color }} />
+              <strong>{name}</strong>
+              <span>{color}</span>
+              <p>{usage}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className="brand-guideline-grid">
+          <div>
+            <h3>视觉原则</h3>
+            {brandVisualGuidelines.principles.map(([title, body]) => (
+              <article key={title}>
+                <strong>{title}</strong>
+                <p>{body}</p>
+              </article>
+            ))}
+          </div>
+          <div>
+            <h3>核心组件</h3>
+            {brandVisualGuidelines.components.map(([title, body]) => (
+              <article key={title}>
+                <strong>{title}</strong>
+                <p>{body}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
