@@ -195,6 +195,17 @@ const promoVideoScenes = [
   },
 ];
 
+const systemOrbitPositions = [
+  [50, 13],
+  [76, 22],
+  [84, 48],
+  [76, 78],
+  [50, 87],
+  [24, 78],
+  [16, 48],
+  [24, 22],
+];
+
 const promoVideoScript = [
   "欢迎来到 30 天重建人生体系。",
   "这个平台不是让你收藏更多知识，而是每天告诉你下一步该做什么。",
@@ -855,42 +866,49 @@ function App() {
         )}
 
         {activeView === "systems" && (
-          <div className="systems-layout">
-            <section className="panel system-detail" id="system-detail-panel">
-              <SectionTitle icon={Compass} title="系统地图" action={activeSystem.order} />
-              <SystemDetail
-                system={activeSystem}
-                onOpenCourse={() => openSystem(activeSystem.id, "courses", "system-course-detail")}
-                onOpenDaily={() => navigateToView("dashboard", "today-action-panel")}
-              />
-            </section>
-            <section className="panel systems-table">
-              <SectionTitle icon={LineChart} title="八大系统总览" action="训练方式可落地" />
-              <div className="system-card-grid">
-                {systems.map((system) => {
+          <div className="systems-layout system-map-layout">
+            <section className="panel systems-table system-orbit-panel">
+              <SectionTitle icon={LineChart} title="八大个人运行系统图谱" action="从状态到身份" />
+              <div className="system-orbit-map">
+                <div className="system-orbit-core">
+                  <span>OPERATING SYSTEM</span>
+                  <strong>8</strong>
+                  <p>围绕每日行动闭环，重建能量、节奏、目标、反馈、学习、关系、价值和身份。</p>
+                </div>
+                {systems.map((system, index) => {
                   const Icon = iconMap[system.icon];
+                  const [x, y] = systemOrbitPositions[index] ?? [50, 50];
                   return (
                     <button
                       key={system.id}
-                      className={system.id === activeSystemId ? "system-card active" : "system-card"}
+                      className={system.id === activeSystemId ? "system-orbit-node active" : "system-orbit-node"}
+                      style={{ "--x": `${x}%`, "--y": `${y}%` }}
                       onClick={() => {
                         setActiveSystemId(system.id);
                         setActiveCourseId(system.id);
                         scrollToId("system-detail-panel");
                       }}
                     >
-                      <Icon size={22} />
-                      <span>{system.order}</span>
+                      <Icon size={19} />
+                      <span>{system.order.replace("系统", "")}</span>
                       <strong>{system.name}</strong>
-                      <em>{system.duration}</em>
                     </button>
                   );
                 })}
               </div>
               <div className="architecture-note">
                 <strong>架构已平台化</strong>
-                <p>原始理念已经转化为八大系统、难度周期、训练方式、每日打卡、课程路径和小组场域，不再以原始材料图展示。</p>
+                <p>原始理念已经转化为可学习、可打卡、可复盘的八大系统，不再只停留在一张说明图。</p>
               </div>
+            </section>
+
+            <section className="panel system-detail premium-system-detail" id="system-detail-panel">
+              <SectionTitle icon={Compass} title="当前系统定义" action={activeSystem.order} />
+              <SystemDetail
+                system={activeSystem}
+                onOpenCourse={() => openSystem(activeSystem.id, "courses", "system-course-detail")}
+                onOpenDaily={() => navigateToView("dashboard", "today-action-panel")}
+              />
             </section>
           </div>
         )}
@@ -1034,7 +1052,7 @@ function DailyEngagementPanel({
   ];
 
   return (
-    <section className="panel daily-engagement-panel" id="daily-ritual">
+    <section className="panel daily-engagement-panel ritual-flow-panel" id="daily-ritual">
       <SectionTitle
         icon={Sparkles}
         title="今日开启仪式"
@@ -1043,7 +1061,7 @@ function DailyEngagementPanel({
 
       <div className="engagement-hero">
         <div>
-          <span>{activeSystem.name}</span>
+          <span>Daily Reset Ritual · {activeSystem.name}</span>
           <h2>{check.completed ? "今天已经点亮，保持记录不断线" : `今天先完成 ${remainingTasks || 1} 个可检查动作`}</h2>
           <p>
             {check.completed
@@ -1057,7 +1075,7 @@ function DailyEngagementPanel({
         </div>
       </div>
 
-      <div className="ritual-step-grid">
+      <div className="ritual-flow-grid">
         {ritualSteps.map((step, index) => (
           <button
             key={step.key}
@@ -1066,72 +1084,76 @@ function DailyEngagementPanel({
             onClick={step.onClick}
           >
             <span>{String(index + 1).padStart(2, "0")}</span>
-            <strong>{step.label}</strong>
-            <em>{step.body}</em>
+            <div>
+              <strong>{step.label}</strong>
+              <em>{step.body}</em>
+            </div>
           </button>
         ))}
       </div>
 
-      <label className="intention-field">
-        今天打开平台，我要保护的一个动作
-        <input
-          id="daily-intention"
-          value={check.intention ?? ""}
-          onChange={(event) => updateCheck(activeDay, { intention: event.target.value })}
-          placeholder="例：今晚 22:00 前完成真实打卡，不失联。"
-        />
-      </label>
+      <div className="ritual-support-grid">
+        <label className="intention-field ritual-intention">
+          今天打开平台，我要保护的一个动作
+          <input
+            id="daily-intention"
+            value={check.intention ?? ""}
+            onChange={(event) => updateCheck(activeDay, { intention: event.target.value })}
+            placeholder="例：今晚 22:00 前完成真实打卡，不失联。"
+          />
+        </label>
 
-      <div className={check.sparkOpened ? "daily-spark-card open" : "daily-spark-card"}>
-        <div className="spark-card-head">
-          <div>
-            <Gift size={18} />
-            <strong>{check.sparkOpened ? todaySpark.title : "今日锦囊未打开"}</strong>
+        <div className={check.sparkOpened ? "daily-spark-card open" : "daily-spark-card"}>
+          <div className="spark-card-head">
+            <div>
+              <Gift size={18} />
+              <strong>{check.sparkOpened ? todaySpark.title : "今日锦囊未打开"}</strong>
+            </div>
+            <button
+              onClick={() =>
+                updateCheck(activeDay, {
+                  sparkOpened: true,
+                  sparkOffset: sparkOffset + 1,
+                })
+              }
+            >
+              {check.sparkOpened ? "换一张" : "打开"}
+            </button>
           </div>
-          <button
-            onClick={() =>
-              updateCheck(activeDay, {
-                sparkOpened: true,
-                sparkOffset: sparkOffset + 1,
-              })
-            }
-          >
-            {check.sparkOpened ? "换一张" : "打开"}
-          </button>
+          <p>{check.sparkOpened ? todaySpark.body : "每天给自己一个微动作，打开后再开始写作业。"}</p>
+          <em>{check.sparkOpened ? todaySpark.action : "打开后显示今天的具体行动。"}</em>
         </div>
-        <p>{check.sparkOpened ? todaySpark.body : "每天给自己一个微动作，打开后再开始写作业。"}</p>
-        <em>{check.sparkOpened ? todaySpark.action : "打开后显示今天的具体行动。"}</em>
-      </div>
 
-      <div className="reward-row">
-        <div className="reward-summary">
-          <Flame size={18} />
-          <div>
-            <strong>连续 {streak} 天</strong>
-            <p>
-              下一枚：{nextReward.title} · 还差 {Math.max(nextReward.day - streak, 0)} 天
-            </p>
+        <div className="reward-row ritual-reward-row">
+          <div className="reward-summary">
+            <Flame size={18} />
+            <div>
+              <strong>连续 {streak} 天</strong>
+              <p>
+                下一枚：{nextReward.title} · 还差 {Math.max(nextReward.day - streak, 0)} 天
+              </p>
+            </div>
+          </div>
+          <div className="reward-badges">
+            {rewardMilestones.map((reward) => {
+              const earned = earnedRewards.some((item) => item.day === reward.day);
+              return (
+                <span key={reward.day} className={earned ? "reward-badge earned" : "reward-badge"}>
+                  <Award size={14} />
+                  {reward.day}天
+                </span>
+              );
+            })}
           </div>
         </div>
-        <div className="reward-badges">
-          {rewardMilestones.map((reward) => {
-            const earned = earnedRewards.some((item) => item.day === reward.day);
-            return (
-              <span key={reward.day} className={earned ? "reward-badge earned" : "reward-badge"}>
-                <Award size={14} />
-                {reward.day}天
-              </span>
-            );
-          })}
-        </div>
-      </div>
 
-      <div className="tomorrow-preview">
-        <span>明日预告</span>
-        <strong>
-          Day {nextProgram.day} · {nextProgram.title}
-        </strong>
-        <p>{nextProgram.lesson}</p>
+        <div className="tomorrow-preview ritual-tomorrow-preview">
+          <span>明日预告</span>
+          <strong>
+            Day {nextProgram.day} · {nextProgram.title}
+          </strong>
+          <p>{nextProgram.lesson}</p>
+        </div>
       </div>
     </section>
   );
@@ -1160,6 +1182,11 @@ function UserPathPanel({
     Boolean(check.completed),
   ];
   const completionPercent = Math.round((completionSignals.filter(Boolean).length / completionSignals.length) * 100);
+  const cabinMeta = [
+    { label: "当前系统", value: activeSystem.name },
+    { label: "训练日", value: activeDay === todayDay ? "今日" : `Day ${activeDay}` },
+    { label: "连续打开", value: `${streak} 天` },
+  ];
   const userStepCards = [
     {
       title: "先安顿今天",
@@ -1182,26 +1209,34 @@ function UserPathPanel({
   ];
 
   return (
-    <section className="panel user-path-panel" id="today-action-panel" aria-label="今日行动台">
-      <div className="user-path-copy">
-        <span>为真实使用而设计</span>
+    <section className="panel user-path-panel restart-cabin" id="today-action-panel" aria-label="今日重启舱">
+      <div className="cabin-atmosphere" aria-hidden="true" />
+      <div className="cabin-main">
+        <span className="cabin-eyebrow">NEWLIFE30 · RESET CABIN</span>
         <h2>
-          Day {activeDay} · {activeProgram.title}
+          Day {activeDay}
+          <em>{activeProgram.title}</em>
         </h2>
         <p>
-          今天不用浏览完整平台。先按“开启、执行、复盘、评分”的顺序走完一轮，
-          让系统替你记住下一步。
+          不再把改变做成一张待办表。今天只进入一个高质量闭环：
+          开启、执行、复盘、评分，让系统替你守住下一步。
         </p>
-        <div className="user-path-meta">
-          <span>{activeSystem.name}</span>
-          <span>{activeDay === todayDay ? "今天" : `查看第 ${activeDay} 天`}</span>
-          <span>连续 {streak} 天</span>
+        <div className="cabin-meta-row">
+          {cabinMeta.map((item) => (
+            <span key={item.label}>
+              <small>{item.label}</small>
+              {item.value}
+            </span>
+          ))}
         </div>
       </div>
 
-      <div className="next-action-card">
-        <span>下一步</span>
-        <strong>{nextAction.label}</strong>
+      <div className="cabin-command-card">
+        <div className="command-head">
+          <span>下一步指令</span>
+          <strong>{completionPercent}%</strong>
+        </div>
+        <h3>{nextAction.label}</h3>
         <p>{nextAction.body}</p>
         <button onClick={() => onNextAction(nextAction)}>
           {nextAction.action}
@@ -1209,9 +1244,9 @@ function UserPathPanel({
         </button>
       </div>
 
-      <div className="user-step-grid">
+      <div className="cabin-stage-grid">
         {userStepCards.map((item, index) => (
-          <article key={item.title} className={item.done ? "user-step-card done" : "user-step-card"}>
+          <article key={item.title} className={item.done ? "cabin-stage-card done" : "cabin-stage-card"}>
             <span>{String(index + 1).padStart(2, "0")}</span>
             <strong>{item.title}</strong>
             <p>{item.body}</p>
@@ -1220,18 +1255,18 @@ function UserPathPanel({
         ))}
       </div>
 
-      <div className="path-progress-card">
+      <div className="cabin-progress-panel">
         <div>
-          <span>今日闭环</span>
+          <span>今日闭环进度</span>
           <strong>{completionPercent}%</strong>
         </div>
         <div className="path-progress-track" aria-hidden="true">
           <i style={{ width: `${completionPercent}%` }} />
         </div>
-        <p>完成闭环后，建议进入睡眠饮食评分，找到明天最值得优化的一步。</p>
+        <p>闭环完成后，进入睡眠饮食评分，找到明天最值得优化的一步。</p>
       </div>
 
-      <div className="path-shortcuts" aria-label="快速入口">
+      <div className="path-shortcuts cabin-shortcuts" aria-label="快速入口">
         <button onClick={() => scrollToId("today-checkin")}>今日打卡</button>
         <button onClick={() => navigateToView("nutrition", "sleep-score")}>睡眠饮食</button>
         <button onClick={() => navigateToView("courses", "system-course-detail")}>继续上课</button>
@@ -1460,21 +1495,39 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
     <div className="academy-layout">
       <section className="panel academy-hero-panel">
         <div className="academy-hero-copy">
-          <span>人生重启研究院</span>
-          <h2>从 30 天训练营，升级为八大个人运行系统课程体系</h2>
+          <span>NEWLIFE30 INSTITUTE</span>
+          <h2>一座为 30 天重启而设计的个人成长研究院</h2>
           <p>
-            课程中心采用“主线课程 + 书籍精读 + 日课训练 + 小组场域”的结构：
-            不是只陈列知识，而是让每一节课都对应一个模型、一个作业和一次真实反馈。
+            课程不再像资料库，而是一个高端训练场：系统课建立底层模型，
+            书籍转化课补充方法论，每日作业把知识压缩成可执行行动。
           </p>
+          <div className="academy-hero-actions">
+            <button onClick={() => selectCourse(activeCourse.id, activeLessonIndex, "lesson-workbench")}>
+              进入今日课程
+              <ChevronRight size={17} />
+            </button>
+            <button onClick={() => selectCourse(activeCourse.id, 0, "book-course-library")}>
+              查看书籍转化课
+            </button>
+          </div>
         </div>
-        <div className="academy-stat-grid">
-          {academyStats.map(([value, label, detail]) => (
-            <article key={label} className="academy-stat-card">
-              <strong>{value}</strong>
-              <span>{label}</span>
-              <p>{detail}</p>
-            </article>
-          ))}
+
+        <div className="academy-showcase">
+          <div className="academy-showcase-card">
+            <span>当前推荐系统课</span>
+            <strong>{activeCourse.name}</strong>
+            <p>{activeCourse.positioning}</p>
+            <em>{completedLessons}/{activeCourse.lessons.length} 理论课已完成</em>
+          </div>
+          <div className="academy-stat-grid">
+            {academyStats.map(([value, label, detail]) => (
+              <article key={label} className="academy-stat-card">
+                <strong>{value}</strong>
+                <span>{label}</span>
+                <p>{detail}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 

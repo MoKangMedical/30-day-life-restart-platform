@@ -3569,6 +3569,606 @@ body {
   border-color: rgba(79, 128, 101, 0.22);
 }
 
+/* Premium restart cabin layer */
+:root {
+  --midnight: #102936;
+  --midnight-2: #17324f;
+  --sage-deep: #395746;
+  --sage-light: #eef5f0;
+  --copper: #b87845;
+  --champagne: #efe2c8;
+  --porcelain: #fbfcfa;
+}
+
+body {
+  background:
+    linear-gradient(180deg, #f3f7f3 0%, #fbfcfa 36%, #f7f9f6 100%);
+}
+
+.restart-cabin {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 0.42fr);
+  gap: 18px;
+  overflow: hidden;
+  padding: 28px;
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, #102936 0%, #17324f 48%, #395746 100%);
+  border-color: rgba(239, 226, 200, 0.2);
+}
+
+.cabin-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 0,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px,
+      transparent 84px
+    );
+  opacity: 0.34;
+}
+
+.cabin-main,
+.cabin-command-card,
+.cabin-stage-grid,
+.cabin-progress-panel,
+.cabin-shortcuts {
+  position: relative;
+  z-index: 1;
+}
+
+.cabin-main {
+  display: grid;
+  align-content: center;
+  min-height: 330px;
+}
+
+.cabin-eyebrow {
+  color: var(--champagne);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.cabin-main h2 {
+  margin: 14px 0 16px;
+  max-width: 820px;
+  color: #ffffff;
+  font-size: 68px;
+  line-height: 0.98;
+}
+
+.cabin-main h2 em {
+  display: block;
+  margin-top: 10px;
+  color: var(--champagne);
+  font-size: 42px;
+  font-style: normal;
+}
+
+.cabin-main p {
+  max-width: 720px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 17px;
+  line-height: 1.82;
+}
+
+.cabin-meta-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 760px;
+  margin-top: 24px;
+}
+
+.cabin-meta-row span {
+  min-width: 0;
+  padding: 13px 14px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.cabin-meta-row small {
+  display: block;
+  margin-bottom: 6px;
+  color: rgba(239, 226, 200, 0.86);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.cabin-command-card {
+  display: grid;
+  align-content: space-between;
+  min-height: 330px;
+  padding: 22px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+.command-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--champagne);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.command-head strong {
+  color: #ffffff;
+  font-size: 31px;
+  line-height: 1;
+}
+
+.cabin-command-card h3 {
+  margin: 22px 0 10px;
+  color: #ffffff;
+  font-size: 29px;
+  line-height: 1.16;
+}
+
+.cabin-command-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.72;
+}
+
+.cabin-command-card button,
+.academy-hero-actions button:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 22px;
+  padding: 0 15px;
+  color: var(--midnight);
+  background: var(--champagne);
+  border: 1px solid rgba(239, 226, 200, 0.72);
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.cabin-stage-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cabin-stage-card {
+  min-height: 128px;
+  padding: 16px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+}
+
+.cabin-stage-card span {
+  color: var(--champagne);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cabin-stage-card strong {
+  display: block;
+  margin-top: 10px;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.cabin-stage-card p {
+  margin: 8px 0 12px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.55;
+}
+
+.cabin-stage-card em {
+  color: var(--champagne);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.cabin-stage-card.done {
+  background: rgba(79, 128, 101, 0.34);
+  border-color: rgba(239, 226, 200, 0.24);
+}
+
+.cabin-progress-panel {
+  grid-column: 1 / -1;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+}
+
+.cabin-progress-panel > div:first-child {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.cabin-progress-panel span {
+  color: var(--champagne);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.cabin-progress-panel strong {
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.cabin-progress-panel p {
+  margin: 9px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.restart-cabin .path-progress-track {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.restart-cabin .path-progress-track i {
+  background: var(--champagne);
+}
+
+.cabin-shortcuts button {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.ritual-flow-panel {
+  padding: 24px;
+  background: var(--porcelain);
+}
+
+.ritual-flow-panel .engagement-hero {
+  grid-template-columns: minmax(0, 1fr) 150px;
+  padding: 22px;
+  background:
+    linear-gradient(135deg, #eef5f0, #f8faf8);
+  border-color: rgba(79, 128, 101, 0.18);
+}
+
+.ritual-flow-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.ritual-flow-grid::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  right: 10%;
+  left: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184, 120, 69, 0.42), transparent);
+}
+
+.ritual-flow-grid .ritual-step {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  min-height: 112px;
+  padding: 16px;
+  background: #ffffff;
+  border-color: rgba(16, 41, 54, 0.1);
+  border-radius: 8px;
+}
+
+.ritual-flow-grid .ritual-step span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: var(--copper);
+  background: #f7eee4;
+  border-radius: 50%;
+}
+
+.ritual-flow-grid .ritual-step.active {
+  color: #ffffff;
+  background: var(--midnight);
+  border-color: var(--midnight);
+}
+
+.ritual-flow-grid .ritual-step.active span {
+  color: var(--midnight);
+  background: var(--champagne);
+}
+
+.ritual-flow-grid .ritual-step.active strong,
+.ritual-flow-grid .ritual-step.active em {
+  color: #ffffff;
+}
+
+.ritual-support-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.ritual-intention,
+.ritual-reward-row {
+  margin-top: 0;
+}
+
+.ritual-support-grid .daily-spark-card,
+.ritual-support-grid .tomorrow-preview {
+  margin-top: 0;
+}
+
+.ritual-reward-row,
+.ritual-tomorrow-preview {
+  background: #ffffff;
+}
+
+.system-map-layout {
+  grid-template-columns: minmax(620px, 1.04fr) minmax(360px, 0.72fr);
+}
+
+.system-orbit-panel {
+  min-height: 720px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f6f8f6 100%);
+}
+
+.system-orbit-map {
+  position: relative;
+  min-height: 610px;
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(238, 245, 240, 0.92), rgba(255, 255, 255, 0.94));
+}
+
+.system-orbit-map::before,
+.system-orbit-map::after {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border: 1px solid rgba(23, 50, 79, 0.1);
+  border-radius: 50%;
+}
+
+.system-orbit-map::after {
+  inset: 25%;
+  border-color: rgba(184, 120, 69, 0.16);
+}
+
+.system-orbit-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 255px;
+  min-height: 255px;
+  padding: 24px;
+  color: #ffffff;
+  background: var(--midnight);
+  border: 1px solid rgba(239, 226, 200, 0.38);
+  border-radius: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.system-orbit-core span {
+  color: var(--champagne);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.system-orbit-core strong {
+  color: #ffffff;
+  font-size: 70px;
+  line-height: 0.9;
+}
+
+.system-orbit-core p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.system-orbit-node {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  z-index: 3;
+  display: grid;
+  gap: 5px;
+  width: 168px;
+  min-height: 108px;
+  padding: 13px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(23, 50, 79, 0.13);
+  border-radius: 10px;
+  text-align: left;
+  transform: translate(-50%, -50%);
+}
+
+.system-orbit-node svg {
+  color: var(--copper);
+}
+
+.system-orbit-node span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.system-orbit-node strong {
+  color: var(--blue);
+  font-size: 16px;
+  line-height: 1.28;
+}
+
+.system-orbit-node.active {
+  color: #ffffff;
+  background: var(--midnight);
+  border-color: rgba(239, 226, 200, 0.45);
+}
+
+.system-orbit-node.active svg,
+.system-orbit-node.active span {
+  color: var(--champagne);
+}
+
+.system-orbit-node.active strong {
+  color: #ffffff;
+}
+
+.premium-system-detail {
+  background:
+    linear-gradient(180deg, #ffffff, #f8faf8);
+}
+
+.premium-system-detail .system-hero {
+  padding: 18px;
+  color: #ffffff;
+  background: var(--midnight);
+  border-radius: 10px;
+}
+
+.premium-system-detail .system-hero h2,
+.premium-system-detail .system-hero span {
+  color: #ffffff;
+}
+
+.premium-system-detail .system-hero svg {
+  color: var(--champagne);
+}
+
+.academy-hero-panel {
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, #102936 0%, #17324f 46%, #5b4a34 100%);
+  border-color: rgba(239, 226, 200, 0.2);
+}
+
+.academy-hero-copy span {
+  color: var(--champagne);
+  letter-spacing: 0;
+}
+
+.academy-hero-copy h2 {
+  color: #ffffff;
+  font-size: 54px;
+  line-height: 1.02;
+}
+
+.academy-hero-copy p {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.academy-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.academy-hero-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.academy-showcase {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+}
+
+.academy-showcase-card {
+  padding: 18px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+}
+
+.academy-showcase-card span,
+.academy-showcase-card em {
+  color: var(--champagne);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.academy-showcase-card strong {
+  display: block;
+  margin: 9px 0;
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1.18;
+}
+
+.academy-showcase-card p {
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.65;
+}
+
+.academy-hero-panel .academy-stat-card {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.academy-hero-panel .academy-stat-card strong {
+  color: var(--champagne);
+}
+
+.academy-hero-panel .academy-stat-card span {
+  color: #ffffff;
+}
+
+.academy-hero-panel .academy-stat-card p {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.course-index-panel {
+  background: #ffffff;
+}
+
+.course-index-row {
+  border-radius: 8px;
+}
+
 @media (max-width: 1180px) {
   .app {
     grid-template-columns: minmax(0, 1fr);
@@ -3811,5 +4411,100 @@ body {
   .breakfast-table span,
   .breakfast-table p {
     border-right: 0;
+  }
+}
+
+@media (max-width: 1180px) {
+  .restart-cabin,
+  .academy-hero-panel,
+  .system-map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cabin-main,
+  .cabin-command-card {
+    min-height: auto;
+  }
+
+  .cabin-command-card {
+    align-content: start;
+  }
+
+  .system-orbit-panel {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .restart-cabin {
+    padding: 22px;
+  }
+
+  .cabin-main h2 {
+    font-size: 42px;
+  }
+
+  .cabin-main h2 em {
+    font-size: 29px;
+  }
+
+  .cabin-main p {
+    font-size: 15px;
+  }
+
+  .cabin-meta-row,
+  .cabin-stage-grid,
+  .ritual-flow-grid,
+  .ritual-support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ritual-flow-grid::before {
+    display: none;
+  }
+
+  .ritual-flow-grid .ritual-step {
+    min-height: auto;
+  }
+
+  .system-orbit-map {
+    position: static;
+    display: grid;
+    gap: 10px;
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .system-orbit-map::before,
+  .system-orbit-map::after {
+    display: none;
+  }
+
+  .system-orbit-core,
+  .system-orbit-node {
+    position: static;
+    width: auto;
+    min-height: auto;
+    border-radius: 10px;
+    transform: none;
+  }
+
+  .system-orbit-core {
+    display: grid;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .system-orbit-core strong {
+    font-size: 48px;
+  }
+
+  .academy-hero-copy h2 {
+    font-size: 36px;
+  }
+
+  .academy-showcase,
+  .academy-hero-panel .academy-stat-grid {
+    grid-template-columns: 1fr;
   }
 }
