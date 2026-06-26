@@ -632,6 +632,44 @@ function App() {
     window.scrollTo({ top: 0, left: 0 });
   }, [activeView, pendingScroll]);
 
+  /* ── 3D tilt-card mouse tracking ── */
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const card = e.target.closest(
+        ".course-index-row, .daily-spark-card, .cabin-command-card, .cabin-stage-card, .system-orbit-node"
+      );
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty("--mouse-x", `${x}%`);
+      card.style.setProperty("--mouse-y", `${y}%`);
+      const wrapper = card.closest(".tilt-card-wrapper");
+      if (wrapper) {
+        const tiltX = ((y - 50) / 50) * -5;
+        const tiltY = ((x - 50) / 50) * 5;
+        card.style.transform = `perspective(900px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+      }
+    };
+    const handleMouseOut = (e) => {
+      const card = e.target.closest(
+        ".course-index-row, .daily-spark-card, .cabin-command-card, .cabin-stage-card, .system-orbit-node"
+      );
+      if (!card) return;
+      card.style.setProperty("--mouse-x", "50%");
+      card.style.setProperty("--mouse-y", "50%");
+      if (card.closest(".tilt-card-wrapper")) {
+        card.style.transform = "";
+      }
+    };
+    document.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("mouseout", handleMouseOut);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseout", handleMouseOut);
+    };
+  }, []);
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -951,10 +989,12 @@ function App() {
                 {systems.map((system, index) => {
                   const Icon = iconMap[system.icon];
                   const [x, y] = systemOrbitPositions[index] ?? [50, 50];
+                  const depthLayer = index % 2 === 0 ? "inner" : "mid";
                   return (
                     <button
                       key={system.id}
                       className={system.id === activeSystemId ? "system-orbit-node active" : "system-orbit-node"}
+                      data-depth={depthLayer}
                       style={{ "--x": `${x}%`, "--y": `${y}%` }}
                       onClick={() => {
                         setActiveSystemId(system.id);
@@ -1689,19 +1729,20 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
           <SectionTitle icon={BookOpen} title="八个体系理论课程" action={`${systemCourseCatalog.length} 个课程包`} />
           <div className="course-index-list">
             {systemCourseCatalog.map((course) => (
-              <button
-                key={course.id}
-                className={course.id === activeCourse.id ? "course-index-row active" : "course-index-row"}
-                onClick={() => selectCourse(course.id, 0, "system-course-detail")}
-              >
-                <span>{course.order}</span>
-                <strong>{course.name}</strong>
-                <em>{course.courseTitle}</em>
-                <small>
-                  {(courseWork[course.id]?.completedLessons && Object.values(courseWork[course.id].completedLessons).filter(Boolean).length) || 0}/
-                  {course.lessons.length} 已完成
-                </small>
-              </button>
+              <div key={course.id} className="tilt-card-wrapper">
+                <button
+                  className={course.id === activeCourse.id ? "course-index-row active" : "course-index-row"}
+                  onClick={() => selectCourse(course.id, 0, "system-course-detail")}
+                >
+                  <span>{course.order}</span>
+                  <strong>{course.name}</strong>
+                  <em>{course.courseTitle}</em>
+                  <small>
+                    {(courseWork[course.id]?.completedLessons && Object.values(courseWork[course.id].completedLessons).filter(Boolean).length) || 0}/
+                    {course.lessons.length} 已完成
+                  </small>
+                </button>
+              </div>
             ))}
           </div>
         </section>

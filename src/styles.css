@@ -5449,3 +5449,502 @@ input[type="date"]:focus {
   border-color: rgba(23, 50, 79, 0.24);
   z-index: 5;
 }
+
+/* =============================================
+   16. PREMIUM 3D EFFECTS — LUXURY TIER
+   ============================================= */
+
+/* --- 16a. 3D Shadow System: Multi-Layer Floating Depth --- */
+
+/* Replace flat shadows with layered depth on panels */
+.panel {
+  box-shadow:
+    0 1px 2px rgba(29, 43, 44, 0.04),
+    0 4px 8px rgba(29, 43, 44, 0.04),
+    0 8px 24px rgba(29, 43, 44, 0.06),
+    0 18px 46px rgba(29, 43, 44, 0.08);
+}
+
+.panel:hover {
+  box-shadow:
+    0 2px 4px rgba(29, 43, 44, 0.05),
+    0 6px 12px rgba(29, 43, 44, 0.06),
+    0 12px 32px rgba(29, 43, 44, 0.08),
+    0 22px 56px rgba(29, 43, 44, 0.1);
+}
+
+/* Cards floating above surface with multi-layer shadow */
+.course-index-row {
+  box-shadow:
+    0 1px 2px rgba(29, 43, 44, 0.03),
+    0 3px 6px rgba(29, 43, 44, 0.05),
+    0 6px 16px rgba(29, 43, 44, 0.06);
+  transition:
+    transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.35s ease,
+    border-color 0.24s ease;
+}
+
+.course-index-row:hover {
+  box-shadow:
+    0 2px 4px rgba(29, 43, 44, 0.05),
+    0 6px 14px rgba(29, 43, 44, 0.08),
+    0 12px 30px rgba(29, 43, 44, 0.1),
+    0 20px 48px rgba(29, 43, 44, 0.06);
+}
+
+.course-index-row.active {
+  box-shadow:
+    0 1px 2px rgba(23, 56, 91, 0.05),
+    0 3px 8px rgba(23, 56, 91, 0.08),
+    0 8px 22px rgba(23, 56, 91, 0.1);
+}
+
+/* Daily spark cards with floating shadows */
+.daily-spark-card {
+  box-shadow:
+    0 1px 2px rgba(184, 120, 69, 0.03),
+    0 3px 8px rgba(184, 120, 69, 0.04),
+    0 6px 18px rgba(184, 120, 69, 0.06);
+  transition:
+    transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.32s ease,
+    border-color 0.28s ease;
+}
+
+.daily-spark-card:hover {
+  box-shadow:
+    0 2px 4px rgba(184, 120, 69, 0.04),
+    0 6px 14px rgba(184, 120, 69, 0.06),
+    0 12px 30px rgba(184, 120, 69, 0.1),
+    0 18px 44px rgba(184, 120, 69, 0.08);
+}
+
+.daily-spark-card.open {
+  box-shadow:
+    0 1px 2px rgba(184, 120, 69, 0.05),
+    0 4px 10px rgba(184, 120, 69, 0.08),
+    0 8px 24px rgba(184, 120, 69, 0.12),
+    0 14px 36px rgba(184, 120, 69, 0.08);
+}
+
+/* Metric cards with premium floating shadows */
+.metric-card {
+  box-shadow:
+    0 1px 2px rgba(29, 43, 44, 0.03),
+    0 3px 6px rgba(29, 43, 44, 0.04),
+    0 6px 16px rgba(29, 43, 44, 0.05);
+}
+
+/* System cards in the orbit */
+.system-orbit-node {
+  box-shadow:
+    0 1px 3px rgba(29, 43, 44, 0.04),
+    0 3px 8px rgba(29, 43, 44, 0.06),
+    0 8px 20px rgba(29, 43, 44, 0.08);
+}
+
+.system-orbit-node:hover {
+  box-shadow:
+    0 2px 4px rgba(29, 43, 44, 0.05),
+    0 6px 14px rgba(29, 43, 44, 0.08),
+    0 14px 38px rgba(29, 43, 44, 0.14),
+    0 20px 50px rgba(29, 43, 44, 0.06);
+}
+
+/* Cabin command card with gold-tinted floating shadow */
+.cabin-command-card {
+  box-shadow:
+    0 2px 4px rgba(239, 226, 200, 0.06),
+    0 6px 16px rgba(16, 41, 54, 0.18),
+    0 14px 36px rgba(16, 41, 54, 0.12);
+}
+
+.cabin-stage-card {
+  box-shadow:
+    0 1px 3px rgba(239, 226, 200, 0.04),
+    0 3px 8px rgba(16, 41, 54, 0.1),
+    0 8px 18px rgba(16, 41, 54, 0.08);
+}
+
+.cabin-progress-panel {
+  box-shadow:
+    0 1px 3px rgba(239, 226, 200, 0.04),
+    0 3px 8px rgba(16, 41, 54, 0.1),
+    0 8px 20px rgba(16, 41, 54, 0.08);
+}
+
+/* --- 16b. Tilt Cards — Apple TV Style --- */
+
+.tilt-card-wrapper {
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.tilt-card-wrapper .course-index-row,
+.tilt-card-wrapper .daily-spark-card,
+.tilt-card-wrapper .cabin-command-card,
+.tilt-card-wrapper .cabin-stage-card {
+  will-change: transform;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.35s ease;
+}
+
+.tilt-card-wrapper .course-index-row::after,
+.tilt-card-wrapper .daily-spark-card::after,
+.tilt-card-wrapper .cabin-command-card::after,
+.tilt-card-wrapper .cabin-stage-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(197, 155, 74, 0.12) 0%,
+    rgba(239, 226, 200, 0.06) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.tilt-card-wrapper:hover .course-index-row::after,
+.tilt-card-wrapper:hover .daily-spark-card::after,
+.tilt-card-wrapper:hover .cabin-command-card::after,
+.tilt-card-wrapper:hover .cabin-stage-card::after {
+  opacity: 1;
+}
+
+/* --- 16c. 3D System Orbit Map Depth --- */
+
+.system-orbit-map {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.system-orbit-node {
+  will-change: transform;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.35s ease,
+    border-color 0.28s ease;
+}
+
+/* Depth layers for orbit nodes: outer rings further back, inner rings closer */
+.system-orbit-node[data-depth="outer"] {
+  transform: translate(-50%, -50%) translateZ(-40px);
+}
+
+.system-orbit-node[data-depth="mid"] {
+  transform: translate(-50%, -50%) translateZ(0px);
+}
+
+.system-orbit-node[data-depth="inner"] {
+  transform: translate(-50%, -50%) translateZ(30px);
+}
+
+.system-orbit-node[data-depth="outer"]:hover {
+  transform: translate(-50%, -50%) translateZ(-40px) scale(1.05);
+}
+
+.system-orbit-node[data-depth="mid"]:hover {
+  transform: translate(-50%, -50%) translateZ(0px) scale(1.05);
+}
+
+.system-orbit-node[data-depth="inner"]:hover {
+  transform: translate(-50%, -50%) translateZ(30px) scale(1.05);
+}
+
+/* Active node pops forward */
+.system-orbit-node.active[data-depth="outer"],
+.system-orbit-node.active[data-depth="mid"],
+.system-orbit-node.active[data-depth="inner"] {
+  transform: translate(-50%, -50%) translateZ(50px);
+}
+
+/* Orbit core at mid-depth */
+.system-orbit-core {
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.system-orbit-map:hover .system-orbit-core {
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+/* --- 16d. 3D Reset Cabin Depth Layers --- */
+
+/* Depth is simulated with z-index + scale + shadow rather than true 3D
+   because overflow:hidden on the container flattens preserve-3d in most engines. */
+
+/* Background atmosphere — far layer (larger scale, behind content) */
+.cabin-atmosphere {
+  z-index: 0;
+  transform: scale(1.04);
+  will-change: transform;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Main content — mid layer */
+.cabin-main {
+  z-index: 1;
+  position: relative;
+  will-change: transform;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Command card — near layer */
+.cabin-command-card {
+  z-index: 2;
+  position: relative;
+  will-change: transform;
+  transition:
+    transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.35s ease;
+}
+
+/* Stage cards — near layer */
+.cabin-stage-card {
+  z-index: 2;
+  position: relative;
+  will-change: transform;
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.3s ease;
+}
+
+/* Progress panel — mid-near */
+.cabin-progress-panel {
+  z-index: 1;
+  position: relative;
+  will-change: transform;
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.3s ease;
+}
+
+.cabin-shortcuts {
+  z-index: 1;
+  position: relative;
+  will-change: transform;
+}
+
+/* Hover lift for cabin interactive elements */
+.cabin-command-card:hover {
+  transform: translateY(-4px);
+}
+
+.cabin-stage-card:hover {
+  transform: translateY(-3px);
+}
+
+.cabin-main:hover {
+  transform: scale(1.01);
+}
+
+/* --- 16e. Course Card 3D Reveal / Flip --- */
+
+@keyframes courseCardReveal {
+  0% {
+    opacity: 0;
+    transform: perspective(800px) rotateY(-8deg) rotateX(3deg) translateZ(-20px);
+    box-shadow:
+      0 2px 6px rgba(16, 41, 54, 0.04),
+      0 4px 12px rgba(16, 41, 54, 0.06);
+  }
+  60% {
+    opacity: 0.9;
+    transform: perspective(800px) rotateY(1deg) rotateX(-0.5deg) translateZ(5px);
+    box-shadow:
+      0 2px 4px rgba(16, 41, 54, 0.05),
+      0 6px 16px rgba(16, 41, 54, 0.08),
+      0 12px 32px rgba(16, 41, 54, 0.1);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg) rotateX(0deg) translateZ(0px);
+    box-shadow:
+      0 1px 2px rgba(16, 41, 54, 0.04),
+      0 4px 10px rgba(16, 41, 54, 0.06),
+      0 8px 22px rgba(16, 41, 54, 0.08);
+  }
+}
+
+.course-hero-block {
+  animation: courseCardReveal 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.course-progress-band {
+  animation: courseCardReveal 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.1s both;
+}
+
+.course-lesson-grid {
+  animation: courseCardReveal 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s both;
+}
+
+.lesson-workbench {
+  animation: courseCardReveal 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
+}
+
+/* --- 16f. Badge 3D Coin Spin Effect --- */
+
+@keyframes badgeCoinEarned {
+  0% {
+    transform: perspective(500px) rotateY(0deg) scale(0.7);
+    box-shadow: 0 1px 2px rgba(79, 128, 101, 0.1);
+    opacity: 0;
+  }
+  30% {
+    transform: perspective(500px) rotateY(180deg) scale(1.08);
+    box-shadow:
+      0 2px 4px rgba(79, 128, 101, 0.12),
+      0 6px 14px rgba(79, 128, 101, 0.18);
+    opacity: 1;
+  }
+  55% {
+    transform: perspective(500px) rotateY(270deg) scale(1.02);
+    box-shadow:
+      0 2px 4px rgba(79, 128, 101, 0.14),
+      0 6px 16px rgba(79, 128, 101, 0.2);
+  }
+  75% {
+    transform: perspective(500px) rotateY(340deg) scale(1.05);
+    box-shadow:
+      0 3px 6px rgba(79, 128, 101, 0.16),
+      0 8px 22px rgba(79, 128, 101, 0.22);
+  }
+  90% {
+    transform: perspective(500px) rotateY(355deg) scale(0.98);
+    box-shadow:
+      0 3px 8px rgba(79, 128, 101, 0.2),
+      0 8px 24px rgba(79, 128, 101, 0.24);
+  }
+  100% {
+    transform: perspective(500px) rotateY(360deg) scale(1);
+    box-shadow:
+      0 3px 12px rgba(79, 128, 101, 0.22),
+      0 8px 24px rgba(79, 128, 101, 0.26);
+  }
+}
+
+.reward-badge.earned {
+  animation:
+    badgeCoinEarned 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both,
+    glowPulse 3.2s ease-in-out 1s infinite;
+  transform-origin: center center;
+}
+
+/* Remove the old shimmer ::after — coin spin replaces it */
+.reward-badge.earned::after {
+  animation: badgeShimmer 3.2s ease-in-out 1s infinite;
+}
+
+/* --- 16g. Subtle Ambient Hover Glow on interactive cards --- */
+
+.course-index-row,
+.daily-spark-card,
+.cabin-command-card,
+.cabin-stage-card,
+.metric-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* system-orbit-node keeps its position:absolute — only add overflow:hidden */
+.system-orbit-node {
+  overflow: hidden;
+}
+
+.course-index-row::before,
+.daily-spark-card::before,
+.cabin-command-card::before,
+.cabin-stage-card::before,
+.system-orbit-node::before,
+.metric-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(197, 155, 74, 0.08) 0%,
+    rgba(239, 226, 200, 0.04) 30%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.course-index-row:hover::before,
+.daily-spark-card:hover::before,
+.cabin-command-card:hover::before,
+.cabin-stage-card:hover::before,
+.system-orbit-node:hover::before,
+.metric-card:hover::before {
+  opacity: 1;
+}
+
+/* --- 16h. Parallax Depth on Cabin Hero --- */
+
+.restart-cabin {
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* Subtle parallax shift on scroll for cabin background */
+@supports (animation-timeline: scroll()) {
+  .cabin-atmosphere {
+    animation: cabinParallaxBg linear both;
+    animation-timeline: scroll(root);
+    animation-range: entry 0% entry 100%;
+  }
+}
+
+@keyframes cabinParallaxBg {
+  0% {
+    transform: scale(1.04) translateY(0px);
+  }
+  100% {
+    transform: scale(1.04) translateY(-20px);
+  }
+}
+
+/* Fallback: subtle static depth */
+.cabin-atmosphere {
+  transform: scale(1.04);
+}
+
+/* --- 16i. Luxury Gold Specular Highlight on Cards --- */
+
+.course-index-row.active::after,
+.system-orbit-node.active::after,
+.reward-badge.earned::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 300deg,
+    rgba(197, 155, 74, 0.15) 310deg,
+    rgba(239, 226, 200, 0.22) 330deg,
+    rgba(197, 155, 74, 0.15) 350deg,
+    transparent 360deg
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.course-index-row.active:hover::after,
+.system-orbit-node.active:hover::after {
+  opacity: 0.6;
+}
