@@ -314,15 +314,24 @@ h1 {
   margin-bottom: 18px;
 }
 
+.secondary-stats {
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
 .metric-card {
   position: relative;
+  display: block;
   min-height: 134px;
+  width: 100%;
   padding: 18px;
+  color: inherit;
   overflow: hidden;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  text-align: left;
 }
 
 .metric-card::after {
@@ -360,6 +369,16 @@ h1 {
   color: var(--ink-soft);
   font-size: 13px;
   line-height: 1.5;
+}
+
+.metric-button {
+  transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+
+.metric-button:hover {
+  background: #ffffff;
+  border-color: rgba(23, 56, 91, 0.28);
+  transform: translateY(-1px);
 }
 
 .dashboard-grid {
@@ -1554,6 +1573,11 @@ textarea::placeholder {
   border-color: rgba(92, 143, 115, 0.28);
 }
 
+.book-course-card.active {
+  background: var(--blue-soft);
+  border-color: rgba(23, 56, 91, 0.3);
+}
+
 .lesson-workbench {
   padding: 18px;
   background: var(--paper-soft);
@@ -1641,6 +1665,86 @@ textarea::placeholder {
   margin: 8px 0 0;
   color: var(--ink-soft);
   line-height: 1.6;
+}
+
+.lesson-content-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.15fr) minmax(280px, 0.85fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.lesson-lecture-card,
+.lesson-case-card,
+.lesson-step-list {
+  min-width: 0;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.lesson-lecture-card span,
+.lesson-case-card span,
+.lesson-step-list span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--clay);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.lesson-lecture-card p,
+.lesson-case-card p,
+.lesson-step-list p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.lesson-lecture-card p + p,
+.lesson-case-card p + strong {
+  margin-top: 10px;
+}
+
+.lesson-case-card strong {
+  display: block;
+  color: var(--blue);
+  font-size: 15px;
+}
+
+.lesson-step-list {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.9fr) repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+  background: var(--blue-soft);
+  border-color: rgba(23, 56, 91, 0.14);
+}
+
+.lesson-step-list > div {
+  min-width: 0;
+}
+
+.lesson-step-list strong {
+  display: block;
+  color: var(--blue);
+  line-height: 1.5;
+}
+
+.lesson-step-list article {
+  min-width: 0;
+  padding: 11px;
+  background: #ffffff;
+  border: 1px solid rgba(23, 56, 91, 0.1);
+  border-radius: 6px;
+}
+
+.lesson-step-list em {
+  color: var(--clay);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
 }
 
 .lesson-interaction-grid {
@@ -2589,6 +2693,32 @@ textarea::placeholder {
   gap: 18px;
 }
 
+.system-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.system-action-row button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 13px;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border: 1px solid rgba(23, 56, 91, 0.14);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.system-action-row button:first-child {
+  color: #ffffff;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
 .system-hero {
   display: flex;
   align-items: center;
@@ -3273,6 +3403,8 @@ dd p {
   .practice-list,
   .course-progress-band,
   .lesson-model-grid,
+  .lesson-content-grid,
+  .lesson-step-list,
   .lesson-interaction-grid,
   .course-action-grid,
   .sleep-score-hero,

@@ -49,6 +49,7 @@ import {
   academyPhases,
   academyStats,
   bookCourseTracks,
+  lessonContentDetails,
   systemCourseCatalog,
 } from "./systemCourses.js";
 
@@ -103,6 +104,13 @@ function daysBetween(start, end) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function contentId(value) {
+  return String(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function createDefaultState() {
@@ -351,6 +359,7 @@ function App() {
   const [activeSystemId, setActiveSystemId] = useState(programDays[todayDay - 1].systemId);
   const [activeCourseId, setActiveCourseId] = useState(systemCourseCatalog[0].id);
   const [activeView, setActiveView] = useState("dashboard");
+  const [pendingScroll, setPendingScroll] = useState(null);
 
   const activeProgram = programDays[activeDay - 1];
   const activeSystem = systems.find((system) => system.id === activeSystemId) ?? systems[0];
@@ -425,9 +434,30 @@ function App() {
     });
   };
 
+  const navigateToView = (viewId, scrollId = "") => {
+    setActiveView(viewId);
+    setPendingScroll(scrollId ? { id: scrollId, viewId } : null);
+  };
+
+  const completeAndShowNext = () => {
+    completeActiveDay();
+    navigateToView("dashboard", "today-action-panel");
+  };
+
   const selectDay = (day) => {
     setActiveDay(day.day);
     setActiveSystemId(day.systemId);
+  };
+
+  const openDay = (day, targetView = "dashboard") => {
+    selectDay(day);
+    navigateToView(targetView, targetView === "dashboard" ? "today-checkin" : "");
+  };
+
+  const openSystem = (systemId, targetView = "systems", scrollId = "system-detail-panel") => {
+    setActiveSystemId(systemId);
+    setActiveCourseId(systemId);
+    navigateToView(targetView, scrollId);
   };
 
   const toggleCourse = (courseId) => {
@@ -481,16 +511,19 @@ function App() {
       return;
     }
     if (action.kind === "complete") {
-      completeActiveDay();
+      completeAndShowNext();
       return;
     }
-    setActiveView("nutrition");
-    window.requestAnimationFrame(() => scrollToId("sleep-score"));
+    navigateToView("nutrition", "sleep-score");
   };
 
   useEffect(() => {
+    if (pendingScroll?.id) {
+      scrollToId(pendingScroll.id);
+      return;
+    }
     window.scrollTo({ top: 0, left: 0 });
-  }, [activeView]);
+  }, [activeView, pendingScroll]);
 
   return (
     <div className="app">
@@ -524,7 +557,7 @@ function App() {
             <button
               key={view.id}
               className={activeView === view.id ? "nav-pill active" : "nav-pill"}
-              onClick={() => setActiveView(view.id)}
+              onClick={() => navigateToView(view.id)}
             >
               {view.label}
             </button>
@@ -539,11 +572,7 @@ function App() {
               <button
                 key={system.id}
                 className={activeSystemId === system.id ? "system-link active" : "system-link"}
-                onClick={() => {
-                  setActiveSystemId(system.id);
-                  setActiveCourseId(system.id);
-                  setActiveView("systems");
-                }}
+                onClick={() => openSystem(system.id)}
               >
                 <Icon size={18} strokeWidth={2} />
                 <span>{system.name}</span>
@@ -572,7 +601,7 @@ function App() {
               <ShieldCheck size={18} />
               {state.pledgeAccepted ? "承诺已确认" : "确认承诺"}
             </button>
-            <button className="primary-action" onClick={completeActiveDay}>
+            <button className="primary-action" onClick={completeAndShowNext}>
               <Save size={18} />
               完成今日打卡
             </button>
@@ -591,7 +620,7 @@ function App() {
             taskTotal={taskTotal}
             streak={streak}
             onNextAction={handleNextAction}
-            setActiveView={setActiveView}
+            navigateToView={navigateToView}
           />
         )}
 
@@ -609,22 +638,20 @@ function App() {
           />
         )}
 
-        <section className="stats-row" aria-label="训练进度">
-          <MetricCard label="30天进度" value={`${score.completedDays}/30`} detail={`今天是第 ${todayDay} 天`} icon={LineChart} />
-          <MetricCard label="连续完成" value={`${streak}天`} detail="从第 1 天起连续计算" icon={Flame} />
-          <MetricCard label="平均精力" value={averageEnergy ? `${averageEnergy}/5` : "未记录"} detail="来自每日状态打卡" icon={Activity} />
-          <MetricCard
-            label="体系课程"
-            value={`${systemCourseProgress.completedLessons}/${systemCourseProgress.totalLessons}`}
-            detail={`核心课 ${score.completedCourses}/4 · 书籍课 ${systemCourseProgress.completedBookCourses}/${systemCourseProgress.totalBookCourses}`}
-            icon={BookOpen}
+        {activeView === "dashboard" && (
+          <ProgressStats
+            score={score}
+            todayDay={todayDay}
+            streak={streak}
+            averageEnergy={averageEnergy}
+            systemCourseProgress={systemCourseProgress}
+            navigateToView={navigateToView}
           />
-          <MetricCard label="积分" value={`${score.totalScore}`} detail={`打卡 ${score.dailyScore} · 课程 ${score.courseScore} · 小组 ${score.groupScore}`} icon={ClipboardCheck} />
-        </section>
+        )}
 
         {activeView === "dashboard" && (
           <div className="dashboard-grid">
-            <section className="panel progress-panel">
+            <section className="panel progress-panel" id="day-progress-panel">
               <SectionTitle icon={CalendarDays} title="30天进度" action={`当前：第 ${activeDay} 天`} />
               <div className="day-grid">
                 {programDays.map((day) => (
@@ -636,7 +663,7 @@ function App() {
                       state.checks[day.day]?.completed ? "done" : "",
                       day.day === todayDay ? "today" : "",
                     ].join(" ")}
-                    onClick={() => selectDay(day)}
+                    onClick={() => openDay(day)}
                     title={`${day.day}. ${day.title}`}
                   >
                     <span>{day.day}</span>
@@ -767,8 +794,7 @@ function App() {
                       key={day.day}
                       className={day.day === activeDay ? "lesson-row active" : "lesson-row"}
                       onClick={() => {
-                        setActiveDay(day.day);
-                        setActiveSystemId(day.systemId);
+                        openDay(day);
                       }}
                     >
                       <span>Day {day.day}</span>
@@ -797,9 +823,13 @@ function App() {
 
         {activeView === "systems" && (
           <div className="systems-layout">
-            <section className="panel system-detail">
+            <section className="panel system-detail" id="system-detail-panel">
               <SectionTitle icon={Compass} title="系统地图" action={activeSystem.order} />
-              <SystemDetail system={activeSystem} />
+              <SystemDetail
+                system={activeSystem}
+                onOpenCourse={() => openSystem(activeSystem.id, "courses", "system-course-detail")}
+                onOpenDaily={() => navigateToView("dashboard", "today-action-panel")}
+              />
             </section>
             <section className="panel systems-table">
               <SectionTitle icon={LineChart} title="八大系统总览" action="训练方式可落地" />
@@ -810,7 +840,11 @@ function App() {
                     <button
                       key={system.id}
                       className={system.id === activeSystemId ? "system-card active" : "system-card"}
-                      onClick={() => setActiveSystemId(system.id)}
+                      onClick={() => {
+                        setActiveSystemId(system.id);
+                        setActiveCourseId(system.id);
+                        scrollToId("system-detail-panel");
+                      }}
                     >
                       <Icon size={22} />
                       <span>{system.order}</span>
@@ -903,6 +937,18 @@ function App() {
               </figure>
             </section>
           </div>
+        )}
+
+        {activeView !== "dashboard" && (
+          <ProgressStats
+            score={score}
+            todayDay={todayDay}
+            streak={streak}
+            averageEnergy={averageEnergy}
+            systemCourseProgress={systemCourseProgress}
+            navigateToView={navigateToView}
+            compact
+          />
         )}
       </main>
     </div>
@@ -1069,7 +1115,7 @@ function UserPathPanel({
   taskTotal,
   streak,
   onNextAction,
-  setActiveView,
+  navigateToView,
 }) {
   const nextAction = getDailyNextAction({ pledgeAccepted, check, taskDoneCount, taskTotal });
   const completionSignals = [
@@ -1103,7 +1149,7 @@ function UserPathPanel({
   ];
 
   return (
-    <section className="panel user-path-panel" aria-label="今日行动台">
+    <section className="panel user-path-panel" id="today-action-panel" aria-label="今日行动台">
       <div className="user-path-copy">
         <span>为真实使用而设计</span>
         <h2>
@@ -1154,8 +1200,8 @@ function UserPathPanel({
 
       <div className="path-shortcuts" aria-label="快速入口">
         <button onClick={() => scrollToId("today-checkin")}>今日打卡</button>
-        <button onClick={() => setActiveView("nutrition")}>睡眠饮食</button>
-        <button onClick={() => setActiveView("courses")}>继续上课</button>
+        <button onClick={() => navigateToView("nutrition", "sleep-score")}>睡眠饮食</button>
+        <button onClick={() => navigateToView("courses", "system-course-detail")}>继续上课</button>
       </div>
     </section>
   );
@@ -1170,6 +1216,7 @@ const lessonSelfCheckItems = [
 function buildLessonBlueprint(course, lessonIndex) {
   const [title, body] = course.lessons[lessonIndex];
   const practice = course.practices[lessonIndex] ?? course.outcome;
+  const detail = lessonContentDetails[course.id]?.[lessonIndex] ?? {};
   return {
     objective: `把「${title}」从概念转成今天可使用的判断模型。`,
     model: [
@@ -1177,6 +1224,11 @@ function buildLessonBlueprint(course, lessonIndex) {
       `建立新规则：用本节课模型解释这个场景，而不是只靠情绪判断。`,
       `完成小动作：${practice}`,
     ],
+    lecture: detail.lecture ?? [body],
+    case: detail.case ?? `把「${title}」放进今天真实生活里的一个场景，观察它如何影响你的选择。`,
+    steps: detail.steps ?? ["写下旧模式", "写下新规则", "完成一个动作", "晚上复盘反馈"],
+    mistake: detail.mistake ?? "常见误区是只理解概念，没有把概念转成一个今天能执行的动作。",
+    assignment: detail.assignment ?? practice,
     prompts: [
       `我过去在「${title}」上最常见的旧反应是什么？`,
       "如果只做一个最小行动，今天具体做什么、什么时候做？",
@@ -1213,6 +1265,8 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
   const bookCourses = bookCourseTracks[activeCourse.id] ?? [];
   const activeWork = courseWork[activeCourse.id] ?? {};
   const [activeLessonIndex, setActiveLessonIndex] = useState(0);
+  const [activeBookTitle, setActiveBookTitle] = useState("");
+  const [pendingCourseScroll, setPendingCourseScroll] = useState("");
   const [copiedCourseText, setCopiedCourseText] = useState(false);
   const activeLesson = buildLessonBlueprint(activeCourse, activeLessonIndex);
   const completedLessons = activeCourse.lessons.filter((_, index) => activeWork.completedLessons?.[index]).length;
@@ -1233,13 +1287,21 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
   const generatedCourseText = buildCourseShareText(activeCourse, activeLessonIndex, activeWork);
 
   useEffect(() => {
-    setActiveLessonIndex(0);
     setActiveSystemId(activeCourseId);
   }, [activeCourseId]);
 
-  const selectCourse = (courseId) => {
+  useEffect(() => {
+    if (!pendingCourseScroll) return;
+    scrollToId(pendingCourseScroll);
+    setPendingCourseScroll("");
+  }, [activeCourse.id, activeLessonIndex, activeBookTitle, pendingCourseScroll]);
+
+  const selectCourse = (courseId, lessonIndex = 0, scrollId = "system-course-detail", bookTitle = "") => {
     setActiveCourseId(courseId);
     setActiveSystemId(courseId);
+    setActiveLessonIndex(lessonIndex);
+    setActiveBookTitle(bookTitle);
+    setPendingCourseScroll(scrollId);
   };
 
   const patchActiveWork = (producer) => updateCourseWork(activeCourse.id, producer);
@@ -1387,7 +1449,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
               <button
                 key={course.id}
                 className={course.id === activeCourse.id ? "course-index-row active" : "course-index-row"}
-                onClick={() => selectCourse(course.id)}
+                onClick={() => selectCourse(course.id, 0, "system-course-detail")}
               >
                 <span>{course.order}</span>
                 <strong>{course.name}</strong>
@@ -1401,7 +1463,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
           </div>
         </section>
 
-        <section className="panel course-detail-panel">
+        <section className="panel course-detail-panel" id="system-course-detail">
           <SectionTitle icon={Compass} title={activeCourse.name} action={activeCourse.order} />
           <div className="course-hero-block">
             <span>{activeCourse.courseTitle}</span>
@@ -1438,7 +1500,11 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
                     index === activeLessonIndex ? "active" : "",
                     activeWork.completedLessons?.[index] ? "done" : "",
                   ].join(" ")}
-                  onClick={() => setActiveLessonIndex(index)}
+                  onClick={() => {
+                    setActiveLessonIndex(index);
+                    setActiveBookTitle("");
+                    setPendingCourseScroll("lesson-workbench");
+                  }}
                 >
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <strong>{title}</strong>
@@ -1448,7 +1514,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             </div>
           </div>
 
-          <div className="course-section lesson-workbench">
+          <div className="course-section lesson-workbench" id="lesson-workbench">
             <div className="lesson-workbench-head">
               <div>
                 <span>Lesson {String(activeLessonIndex + 1).padStart(2, "0")}</span>
@@ -1469,6 +1535,34 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
                 <article key={item}>
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <p>{item}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="lesson-content-grid">
+              <article className="lesson-lecture-card">
+                <span>课程讲义</span>
+                {activeLesson.lecture.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </article>
+              <article className="lesson-case-card">
+                <span>真实案例</span>
+                <p>{activeLesson.case}</p>
+                <strong>常见误区</strong>
+                <p>{activeLesson.mistake}</p>
+              </article>
+            </div>
+
+            <div className="lesson-step-list">
+              <div>
+                <span>本课执行步骤</span>
+                <strong>{activeLesson.assignment}</strong>
+              </div>
+              {activeLesson.steps.map((step, index) => (
+                <article key={step}>
+                  <em>{String(index + 1).padStart(2, "0")}</em>
+                  <p>{step}</p>
                 </article>
               ))}
             </div>
@@ -1558,13 +1652,18 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             </div>
           </div>
 
-          <div className="course-section">
+          <div className="course-section" id="book-course-library">
             <h3>热门书籍转化课程</h3>
             <div className="book-course-grid">
               {bookCourses.map((course) => (
                 <article
                   key={course.courseTitle}
-                  className={activeWork.completedBooks?.[course.courseTitle] ? "book-course-card done" : "book-course-card"}
+                  id={`book-course-${contentId(course.courseTitle)}`}
+                  className={[
+                    "book-course-card",
+                    activeWork.completedBooks?.[course.courseTitle] ? "done" : "",
+                    activeBookTitle === course.courseTitle ? "active" : "",
+                  ].join(" ")}
                 >
                   <span>{course.source}</span>
                   <strong>{course.courseTitle}</strong>
@@ -1595,7 +1694,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             </div>
           </div>
 
-          <div className="course-section course-action-plan">
+          <div className="course-section course-action-plan" id="course-action-plan">
             <h3>系统行动方案</h3>
             <div className="course-action-grid">
               <label>
@@ -1617,7 +1716,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             </div>
           </div>
 
-          <div className="course-section">
+          <div className="course-section" id="recommended-books">
             <h3>推荐书目</h3>
             <div className="book-grid">
               {activeCourse.books.map(([title, author, reason, url]) => (
@@ -1630,7 +1729,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
             </div>
           </div>
 
-          <div className="course-section audio-block">
+          <div className="course-section audio-block" id="course-audio">
             <div>
               <Headphones size={20} />
               <h3>课程语音概要</h3>
@@ -1655,8 +1754,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
                 courseWork[lesson.systemId]?.completedLessons?.[(lesson.number - 1) % 4] ? "done" : "",
               ].join(" ")}
               onClick={() => {
-                selectCourse(lesson.systemId);
-                setActiveLessonIndex((lesson.number - 1) % 4);
+                selectCourse(lesson.systemId, (lesson.number - 1) % 4, "lesson-workbench");
               }}
             >
               <span>Lesson {String(lesson.number).padStart(2, "0")}</span>
@@ -1680,7 +1778,7 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
                 <button
                   key={item.courseTitle}
                   className={courseWork[course.id]?.completedBooks?.[item.courseTitle] ? "book-library-row done" : "book-library-row"}
-                  onClick={() => selectCourse(course.id)}
+                  onClick={() => selectCourse(course.id, 0, `book-course-${contentId(item.courseTitle)}`, item.courseTitle)}
                 >
                   <em>{item.source}</em>
                   <b>{item.courseTitle}</b>
@@ -1782,14 +1880,57 @@ function TheoryView() {
   );
 }
 
-function MetricCard({ label, value, detail, icon: Icon }) {
+function ProgressStats({ score, todayDay, streak, averageEnergy, systemCourseProgress, navigateToView, compact = false }) {
   return (
-    <article className="metric-card">
+    <section className={compact ? "stats-row secondary-stats" : "stats-row"} aria-label="训练进度">
+      <MetricCard
+        label="30天进度"
+        value={`${score.completedDays}/30`}
+        detail={`今天是第 ${todayDay} 天`}
+        icon={LineChart}
+        onClick={() => navigateToView("dashboard", "day-progress-panel")}
+      />
+      <MetricCard
+        label="连续完成"
+        value={`${streak}天`}
+        detail="从第 1 天起连续计算"
+        icon={Flame}
+        onClick={() => navigateToView("dashboard", "daily-ritual")}
+      />
+      <MetricCard
+        label="平均精力"
+        value={averageEnergy ? `${averageEnergy}/5` : "未记录"}
+        detail="来自每日状态打卡"
+        icon={Activity}
+        onClick={() => navigateToView("nutrition", "sleep-score")}
+      />
+      <MetricCard
+        label="体系课程"
+        value={`${systemCourseProgress.completedLessons}/${systemCourseProgress.totalLessons}`}
+        detail={`核心课 ${score.completedCourses}/4 · 书籍课 ${systemCourseProgress.completedBookCourses}/${systemCourseProgress.totalBookCourses}`}
+        icon={BookOpen}
+        onClick={() => navigateToView("courses", "system-course-detail")}
+      />
+      <MetricCard
+        label="积分"
+        value={`${score.totalScore}`}
+        detail={`打卡 ${score.dailyScore} · 课程 ${score.courseScore} · 小组 ${score.groupScore}`}
+        icon={ClipboardCheck}
+        onClick={() => navigateToView("group")}
+      />
+    </section>
+  );
+}
+
+function MetricCard({ label, value, detail, icon: Icon, onClick }) {
+  const Component = onClick ? "button" : "article";
+  return (
+    <Component className={onClick ? "metric-card metric-button" : "metric-card"} onClick={onClick}>
       <Icon size={21} />
       <span>{label}</span>
       <strong>{value}</strong>
       <p>{detail}</p>
-    </article>
+    </Component>
   );
 }
 
@@ -2414,7 +2555,7 @@ function CommitmentPanel({ state, setState }) {
   );
 }
 
-function SystemDetail({ system }) {
+function SystemDetail({ system, onOpenCourse, onOpenDaily }) {
   const Icon = iconMap[system.icon];
   return (
     <article className="system-detail-content">
@@ -2441,6 +2582,16 @@ function SystemDetail({ system }) {
           ))}
         </dd>
       </dl>
+      <div className="system-action-row">
+        <button onClick={onOpenCourse}>
+          <BookOpen size={17} />
+          学习本系统课程
+        </button>
+        <button onClick={onOpenDaily}>
+          <ClipboardCheck size={17} />
+          回到今日训练
+        </button>
+      </div>
     </article>
   );
 }

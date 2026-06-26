@@ -49,11 +49,44 @@
     <text class="outcome-box">{{activeCourse.outcome}}</text>
 
     <text class="detail-title">理论课程结构</text>
-    <view wx:for="{{activeCourse.lessonViews}}" wx:key="title" class="lesson-card">
+    <button
+      wx:for="{{activeCourse.lessonViews}}"
+      wx:key="title"
+      data-index="{{item.index}}"
+      class="lesson-card {{item.active ? 'active' : ''}}"
+      bindtap="selectLesson"
+    >
       <text class="lesson-num">{{item.num}}</text>
       <view>
         <text class="lesson-title">{{item.title}}</text>
         <text class="lesson-body">{{item.body}}</text>
+      </view>
+    </button>
+
+    <view class="lesson-detail-card">
+      <view class="lesson-detail-head">
+        <text>{{activeCourse.activeLesson.num}}</text>
+        <view>
+          <text class="lesson-detail-title">{{activeCourse.activeLesson.title}}</text>
+          <text class="lesson-detail-body">{{activeCourse.activeLesson.body}}</text>
+        </view>
+      </view>
+
+      <text class="detail-subtitle">课程讲义</text>
+      <text wx:for="{{activeCourse.activeLesson.lecture}}" wx:key="*this" class="paragraph">{{item}}</text>
+
+      <text class="detail-subtitle">真实案例</text>
+      <text class="paragraph">{{activeCourse.activeLesson.caseText}}</text>
+
+      <text class="detail-subtitle">常见误区</text>
+      <text class="paragraph">{{activeCourse.activeLesson.mistake}}</text>
+
+      <text class="detail-subtitle">本课执行步骤</text>
+      <text wx:for="{{activeCourse.activeLesson.steps}}" wx:key="*this" class="step-line">{{index + 1}}. {{item}}</text>
+
+      <view class="assignment-box">
+        <text>本课作业</text>
+        <text>{{activeCourse.activeLesson.assignment}}</text>
       </view>
     </view>
 

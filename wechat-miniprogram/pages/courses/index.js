@@ -8,14 +8,41 @@ function buildCourseViews(activeId) {
   }));
 }
 
-function buildActiveCourse(course) {
+function buildLessonDetail(course, lessonIndex) {
+  const lesson = course.lessons[lessonIndex] || course.lessons[0];
+  const practice = (course.practices || [])[lessonIndex] || course.outcome;
+  return {
+    num: String(lessonIndex + 1).padStart(2, "0"),
+    title: lesson[0],
+    body: lesson[1],
+    lecture: [
+      `${lesson[0]}：${lesson[1]}`,
+      `这节课在「${course.name}」里的作用，是把${course.courseTitle}从概念转成今天可以执行、明天可以复盘的动作。`,
+    ],
+    caseText: `把「${lesson[0]}」放到今天的一个真实场景里：先观察旧反应，再用本课模型解释它，最后只做一个最小修正。`,
+    mistake: "只听懂概念，没有写下具体场景、具体动作和检查标准。",
+    steps: [
+      "写下旧模式",
+      "写下本课新规则",
+      practice,
+      "晚上记录反馈",
+    ],
+    assignment: practice,
+  };
+}
+
+function buildActiveCourse(course, activeLessonIndex = 0) {
   return {
     ...course,
     lessonViews: course.lessons.map((lesson, index) => ({
       num: String(index + 1).padStart(2, "0"),
       title: lesson[0],
       body: lesson[1],
+      active: index === activeLessonIndex,
+      index,
     })),
+    activeLessonIndex,
+    activeLesson: buildLessonDetail(course, activeLessonIndex),
     practiceViews: course.practices || [],
     bookViews: course.books.map((book) => ({
       title: book[0],
@@ -41,7 +68,8 @@ Page({
     courses: buildCourseViews(courses[0].id),
     coreCourses: buildCoreViews({}),
     activeId: courses[0].id,
-    activeCourse: buildActiveCourse(courses[0]),
+    activeLessonIndex: 0,
+    activeCourse: buildActiveCourse(courses[0], 0),
     courseChecks: {},
     playing: false,
   },
@@ -68,11 +96,12 @@ Page({
   refresh() {
     const state = getState();
     const activeCourse = courses.find((course) => course.id === this.data.activeId) || courses[0];
+    const activeLessonIndex = this.data.activeLessonIndex || 0;
     const courseChecks = state.courses || {};
     this.setData({
       courses: buildCourseViews(this.data.activeId),
       coreCourses: buildCoreViews(courseChecks),
-      activeCourse: buildActiveCourse(activeCourse),
+      activeCourse: buildActiveCourse(activeCourse, activeLessonIndex),
       courseChecks,
     });
   },
@@ -85,9 +114,19 @@ Page({
     }
     this.setData({
       activeId,
+      activeLessonIndex: 0,
       courses: buildCourseViews(activeId),
-      activeCourse: buildActiveCourse(activeCourse),
+      activeCourse: buildActiveCourse(activeCourse, 0),
       playing: false,
+    });
+  },
+
+  selectLesson(event) {
+    const activeLessonIndex = Number(event.currentTarget.dataset.index || 0);
+    const activeCourse = courses.find((course) => course.id === this.data.activeId) || courses[0];
+    this.setData({
+      activeLessonIndex,
+      activeCourse: buildActiveCourse(activeCourse, activeLessonIndex),
     });
   },
 
