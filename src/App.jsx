@@ -71,13 +71,13 @@ const iconMap = {
 };
 
 const viewLabels = [
-  { id: "dashboard", label: "今日重启" },
-  { id: "theory", label: "理论体系" },
-  { id: "courses", label: "八系课程" },
-  { id: "learning", label: "学习机制" },
-  { id: "group", label: "小组场域" },
-  { id: "systems", label: "系统地图" },
-  { id: "nutrition", label: "身心日课" },
+  { id: "dashboard", label: "今天要做" },
+  { id: "nutrition", label: "睡眠饮食" },
+  { id: "courses", label: "系统课程" },
+  { id: "learning", label: "学习路径" },
+  { id: "group", label: "群内打卡" },
+  { id: "systems", label: "八大系统" },
+  { id: "theory", label: "为什么练" },
 ];
 
 function getLocalDate() {
@@ -275,6 +275,74 @@ function buildCheckinMessage(mode, values = {}, activeDay) {
   return lines.join("\n").trim();
 }
 
+function scrollToId(id, shouldFocus = false) {
+  window.requestAnimationFrame(() => {
+    const element = document.getElementById(id);
+    if (!element) return;
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (shouldFocus && typeof element.focus === "function") {
+      window.setTimeout(() => element.focus(), 260);
+    }
+  });
+}
+
+function getDailyNextAction({ pledgeAccepted, check, taskDoneCount, taskTotal }) {
+  if (!pledgeAccepted) {
+    return {
+      label: "先确认承诺",
+      body: "给这 30 天一个边界，系统才会开始记录你的真实训练。",
+      action: "确认承诺",
+      kind: "pledge",
+    };
+  }
+  if (!check.ritualStarted) {
+    return {
+      label: "开启今日",
+      body: "先进入训练状态，再处理课程、任务和复盘。",
+      action: "开始",
+      kind: "ritual",
+    };
+  }
+  if (!check.intention?.trim()) {
+    return {
+      label: "写下今日保护动作",
+      body: "只保护一个动作，避免一打开平台就被所有模块分散。",
+      action: "去填写",
+      kind: "intention",
+    };
+  }
+  if (taskDoneCount < taskTotal) {
+    return {
+      label: "完成最小任务",
+      body: `今天还有 ${taskTotal - taskDoneCount} 个动作未勾选，先让行动发生。`,
+      action: "去打卡",
+      kind: "tasks",
+    };
+  }
+  if (!check.output?.trim() || !check.reflection?.trim()) {
+    return {
+      label: "写下输出和复盘",
+      body: "真实记录会把今天变成明天可优化的系统反馈。",
+      action: "去复盘",
+      kind: "reflection",
+    };
+  }
+  if (!check.completed) {
+    return {
+      label: "收束今天",
+      body: "任务和复盘已经就绪，点亮今天，保持连续性。",
+      action: "完成打卡",
+      kind: "complete",
+    };
+  }
+  return {
+    label: "记录睡眠饮食",
+    body: "今天已经完成主线，继续给身体底盘打分，明天更容易调整。",
+    action: "去评分",
+    kind: "nutrition",
+  };
+}
+
 function App() {
   const [state, setState] = useStoredState();
   const today = getLocalDate();
@@ -384,6 +452,41 @@ function App() {
   const taskDoneCount = activeProgram.tasks.filter((task) => check.tasks?.[task]).length;
   const activeDayDate = addDays(state.startDate, activeDay - 1);
   const nextProgram = programDays[Math.min(activeDay, 29)];
+  const taskTotal = activeProgram.tasks.length;
+
+  const togglePledge = () => {
+    setState((current) => ({ ...current, pledgeAccepted: !current.pledgeAccepted }));
+  };
+
+  const handleNextAction = (action) => {
+    if (action.kind === "pledge") {
+      setState((current) => ({ ...current, pledgeAccepted: true }));
+      return;
+    }
+    if (action.kind === "ritual") {
+      updateCheck(activeDay, { ritualStarted: true });
+      scrollToId("daily-ritual");
+      return;
+    }
+    if (action.kind === "intention") {
+      scrollToId("daily-intention", true);
+      return;
+    }
+    if (action.kind === "tasks") {
+      scrollToId("today-checkin");
+      return;
+    }
+    if (action.kind === "reflection") {
+      scrollToId("today-output", true);
+      return;
+    }
+    if (action.kind === "complete") {
+      completeActiveDay();
+      return;
+    }
+    setActiveView("nutrition");
+    window.requestAnimationFrame(() => scrollToId("sleep-score"));
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
@@ -464,7 +567,7 @@ function App() {
           <div className="top-actions">
             <button
               className={state.pledgeAccepted ? "pledge-button accepted" : "pledge-button"}
-              onClick={() => setState((current) => ({ ...current, pledgeAccepted: !current.pledgeAccepted }))}
+              onClick={togglePledge}
             >
               <ShieldCheck size={18} />
               {state.pledgeAccepted ? "承诺已确认" : "确认承诺"}
@@ -475,6 +578,22 @@ function App() {
             </button>
           </div>
         </header>
+
+        {activeView === "dashboard" && (
+          <UserPathPanel
+            activeDay={activeDay}
+            todayDay={todayDay}
+            activeProgram={activeProgram}
+            activeSystem={activeDaySystem}
+            check={check}
+            pledgeAccepted={state.pledgeAccepted}
+            taskDoneCount={taskDoneCount}
+            taskTotal={taskTotal}
+            streak={streak}
+            onNextAction={handleNextAction}
+            setActiveView={setActiveView}
+          />
+        )}
 
         {activeView === "dashboard" && (
           <DailyEngagementPanel
@@ -534,7 +653,7 @@ function App() {
               </div>
             </section>
 
-            <section className="panel today-panel">
+            <section className="panel today-panel" id="today-checkin">
               <SectionTitle icon={ClipboardCheck} title="今日打卡" action={activeDayDate} />
               <div className="day-heading">
                 <div>
@@ -581,6 +700,7 @@ function App() {
               <label className="note-field">
                 今日输出：{activeProgram.output}
                 <textarea
+                  id="today-output"
                   value={check.output ?? ""}
                   onChange={(event) => updateCheck(activeDay, { output: event.target.value })}
                   placeholder="写下今天的真实输出，不需要完美。"
@@ -589,6 +709,7 @@ function App() {
               <label className="note-field">
                 复盘问题：{activeProgram.prompt}
                 <textarea
+                  id="today-reflection"
                   value={check.reflection ?? ""}
                   onChange={(event) => updateCheck(activeDay, { reflection: event.target.value })}
                   placeholder="用几句话回答今天的问题。"
@@ -834,7 +955,7 @@ function DailyEngagementPanel({
   ];
 
   return (
-    <section className="panel daily-engagement-panel">
+    <section className="panel daily-engagement-panel" id="daily-ritual">
       <SectionTitle
         icon={Sparkles}
         title="今日开启仪式"
@@ -875,6 +996,7 @@ function DailyEngagementPanel({
       <label className="intention-field">
         今天打开平台，我要保护的一个动作
         <input
+          id="daily-intention"
           value={check.intention ?? ""}
           onChange={(event) => updateCheck(activeDay, { intention: event.target.value })}
           placeholder="例：今晚 22:00 前完成真实打卡，不失联。"
@@ -931,6 +1053,109 @@ function DailyEngagementPanel({
           Day {nextProgram.day} · {nextProgram.title}
         </strong>
         <p>{nextProgram.lesson}</p>
+      </div>
+    </section>
+  );
+}
+
+function UserPathPanel({
+  activeDay,
+  todayDay,
+  activeProgram,
+  activeSystem,
+  check,
+  pledgeAccepted,
+  taskDoneCount,
+  taskTotal,
+  streak,
+  onNextAction,
+  setActiveView,
+}) {
+  const nextAction = getDailyNextAction({ pledgeAccepted, check, taskDoneCount, taskTotal });
+  const completionSignals = [
+    pledgeAccepted,
+    Boolean(check.ritualStarted),
+    Boolean(check.intention?.trim()),
+    taskDoneCount >= taskTotal,
+    Boolean(check.output?.trim() && check.reflection?.trim()),
+    Boolean(check.completed),
+  ];
+  const completionPercent = Math.round((completionSignals.filter(Boolean).length / completionSignals.length) * 100);
+  const userStepCards = [
+    {
+      title: "先安顿今天",
+      body: check.intention?.trim() || "写一个今天最想保护的动作。",
+      status: check.intention?.trim() ? "已设定" : "待填写",
+      done: Boolean(check.intention?.trim()),
+    },
+    {
+      title: "再完成动作",
+      body: `${taskDoneCount}/${taskTotal} 个打卡动作已完成。`,
+      status: taskDoneCount >= taskTotal ? "已完成" : "进行中",
+      done: taskDoneCount >= taskTotal,
+    },
+    {
+      title: "最后做复盘",
+      body: check.completed ? "今天已点亮，可以进入睡眠饮食评分。" : "写输出和复盘后收束当天。",
+      status: check.completed ? "已点亮" : "未收束",
+      done: Boolean(check.completed),
+    },
+  ];
+
+  return (
+    <section className="panel user-path-panel" aria-label="今日行动台">
+      <div className="user-path-copy">
+        <span>为真实使用而设计</span>
+        <h2>
+          Day {activeDay} · {activeProgram.title}
+        </h2>
+        <p>
+          今天不用浏览完整平台。先按“开启、执行、复盘、评分”的顺序走完一轮，
+          让系统替你记住下一步。
+        </p>
+        <div className="user-path-meta">
+          <span>{activeSystem.name}</span>
+          <span>{activeDay === todayDay ? "今天" : `查看第 ${activeDay} 天`}</span>
+          <span>连续 {streak} 天</span>
+        </div>
+      </div>
+
+      <div className="next-action-card">
+        <span>下一步</span>
+        <strong>{nextAction.label}</strong>
+        <p>{nextAction.body}</p>
+        <button onClick={() => onNextAction(nextAction)}>
+          {nextAction.action}
+          <ChevronRight size={17} />
+        </button>
+      </div>
+
+      <div className="user-step-grid">
+        {userStepCards.map((item, index) => (
+          <article key={item.title} className={item.done ? "user-step-card done" : "user-step-card"}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{item.title}</strong>
+            <p>{item.body}</p>
+            <em>{item.status}</em>
+          </article>
+        ))}
+      </div>
+
+      <div className="path-progress-card">
+        <div>
+          <span>今日闭环</span>
+          <strong>{completionPercent}%</strong>
+        </div>
+        <div className="path-progress-track" aria-hidden="true">
+          <i style={{ width: `${completionPercent}%` }} />
+        </div>
+        <p>完成闭环后，建议进入睡眠饮食评分，找到明天最值得优化的一步。</p>
+      </div>
+
+      <div className="path-shortcuts" aria-label="快速入口">
+        <button onClick={() => scrollToId("today-checkin")}>今日打卡</button>
+        <button onClick={() => setActiveView("nutrition")}>睡眠饮食</button>
+        <button onClick={() => setActiveView("courses")}>继续上课</button>
       </div>
     </section>
   );
@@ -1744,7 +1969,7 @@ function SleepScorePanel({ activeDay, check, updateCheck }) {
   };
 
   return (
-    <section className="panel sleep-score-panel">
+    <section className="panel sleep-score-panel" id="sleep-score">
       <SectionTitle icon={Moon} title="睡眠系统评分" action={`${total}/100`} />
       <div className="sleep-score-hero">
         <div>
