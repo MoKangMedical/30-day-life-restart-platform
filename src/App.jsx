@@ -275,6 +275,77 @@ const brandVisualGuidelines = {
   ],
 };
 
+const internationalProductGoals = [
+  {
+    platform: "Mindvalley",
+    goal: "每天 20 分钟也能进入转化训练",
+    lesson: "把大课程拆成每日微训练，让用户不用等有整块时间才开始。",
+  },
+  {
+    platform: "Fabulous",
+    goal: "用行为科学建立晨间、日间、晚间 routine",
+    lesson: "从用户生活场景出发，给出可被完成的流程，而不是泛泛建议。",
+  },
+  {
+    platform: "Headspace",
+    goal: "用户按压力、睡眠、焦虑、专注等状态进入内容",
+    lesson: "把入口从课程分类改成用户当前问题，降低第一次使用门槛。",
+  },
+  {
+    platform: "Brilliant / Duolingo",
+    goal: "挑战、连胜、每日目标让用户持续回来",
+    lesson: "留存机制必须服务学习和行动，不做廉价游戏化。",
+  },
+];
+
+const userNeedEntries = [
+  {
+    id: "sleep",
+    title: "睡不好",
+    body: "先进入睡眠饮食评分，找到今晚最值得调整的一步。",
+    action: "做睡眠评分",
+    view: "nutrition",
+    scrollId: "sleep-score",
+    intention: "今晚先完成睡眠饮食评分，找到一个可执行调整。",
+  },
+  {
+    id: "energy",
+    title: "没精力",
+    body: "从身心能量系统开始，先稳定饮食、睡眠、运动和情绪。",
+    action: "看能量系统",
+    view: "systems",
+    scrollId: "system-detail-panel",
+    systemId: "energy",
+    intention: "今天只保护一件事：先恢复精力，不硬扛。",
+  },
+  {
+    id: "chaos",
+    title: "节奏乱",
+    body: "进入今日开启仪式，把今天压缩成一个能完成的闭环。",
+    action: "开启今日",
+    view: "dashboard",
+    scrollId: "daily-ritual",
+    intention: "今天不求多，只完成一个清晰闭环。",
+  },
+  {
+    id: "learning",
+    title: "学不进去",
+    body: "从课程研究院进入当前系统课，把一节课转成一个动作。",
+    action: "进入课程",
+    view: "courses",
+    scrollId: "lesson-workbench",
+    systemId: "learning",
+    intention: "今天只学一节课，并写下一个可执行动作。",
+  },
+];
+
+const retentionLoops = [
+  ["今日唯一动作", "减少选择，把注意力放在当前最小闭环。"],
+  ["锦囊与徽章", "每天给一个轻量惊喜，让打开动作有反馈。"],
+  ["连续天数", "用连胜提醒持续性，但允许真实复盘，不追求完美。"],
+  ["群内输出", "把学习转成可分享文本，形成外部承诺。"],
+];
+
 const promoVideoScript = [
   "欢迎来到 30 天重建人生体系。",
   "这个平台不是让你收藏更多知识，而是每天告诉你下一步该做什么。",
@@ -776,6 +847,16 @@ function App() {
         )}
 
         {activeView === "dashboard" && (
+          <TransformationCompassPanel
+            activeDay={activeDay}
+            check={check}
+            updateCheck={updateCheck}
+            navigateToView={navigateToView}
+            openSystem={openSystem}
+          />
+        )}
+
+        {activeView === "dashboard" && (
           <DailyEngagementPanel
             activeDay={activeDay}
             todayDay={todayDay}
@@ -786,6 +867,19 @@ function App() {
             taskDoneCount={taskDoneCount}
             streak={streak}
             updateCheck={updateCheck}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <RetentionEnginePanel
+            activeDay={activeDay}
+            activeProgram={activeProgram}
+            check={check}
+            taskDoneCount={taskDoneCount}
+            taskTotal={taskTotal}
+            streak={streak}
+            updateCheck={updateCheck}
+            navigateToView={navigateToView}
           />
         )}
 
@@ -1281,6 +1375,73 @@ function DailyEngagementPanel({
   );
 }
 
+function RetentionEnginePanel({
+  activeDay,
+  activeProgram,
+  check,
+  taskDoneCount,
+  taskTotal,
+  streak,
+  updateCheck,
+  navigateToView,
+}) {
+  const remainingTasks = Math.max(taskTotal - taskDoneCount, 0);
+  const nextReward = getNextReward(streak);
+  const returnReason = check.returnReason ?? "";
+  const retentionMetrics = [
+    ["今日目标", remainingTasks ? `还差 ${remainingTasks} 个动作` : "今日动作已完成"],
+    ["连续打开", `${streak} 天`],
+    ["下一枚徽章", `${nextReward.title} · ${Math.max(nextReward.day - streak, 0)} 天`],
+  ];
+
+  return (
+    <section className="panel retention-engine-panel" aria-label="用户留存和完成感机制">
+      <div className="retention-copy">
+        <span>Retention Loop</span>
+        <h2>让用户明天还想回来</h2>
+        <p>
+          顶级习惯和学习产品都会把“回来”设计成可见反馈。这里用目标、连胜、徽章、
+          群输出和明日理由，帮用户把 30 天跑完。
+        </p>
+        <div className="retention-loop-list">
+          {retentionLoops.map(([title, body]) => (
+            <article key={title}>
+              <strong>{title}</strong>
+              <p>{body}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="return-command-card">
+        <span>下一次打开的理由</span>
+        <strong>Day {activeProgram.day} · {activeProgram.title}</strong>
+        <div className="retention-metrics">
+          {retentionMetrics.map(([label, value]) => (
+            <div key={label}>
+              <small>{label}</small>
+              <b>{value}</b>
+            </div>
+          ))}
+        </div>
+        <label>
+          明天回来，我要继续完成什么？
+          <textarea
+            value={returnReason}
+            onChange={(event) => updateCheck(activeDay, { returnReason: event.target.value })}
+            placeholder="例：明天早上先打开平台，完成睡眠评分和一个最小动作。"
+          />
+        </label>
+        <div className="return-command-actions">
+          <button onClick={() => navigateToView("dashboard", "daily-ritual")}>开启仪式</button>
+          <button onClick={() => navigateToView("group")}>群内输出</button>
+          <button onClick={() => navigateToView("courses", "lesson-workbench")}>继续学习</button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function UserPathPanel({
   activeDay,
   todayDay,
@@ -1443,6 +1604,59 @@ function PromoVideoPanel({ navigateToView }) {
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{scene.title}</strong>
               <p>{scene.body}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TransformationCompassPanel({ activeDay, check, updateCheck, navigateToView, openSystem }) {
+  const handleEntry = (entry) => {
+    updateCheck(activeDay, {
+      intention: entry.intention,
+      selectedNeed: entry.id,
+    });
+
+    if (entry.systemId) {
+      openSystem(entry.systemId, entry.view, entry.scrollId);
+      return;
+    }
+
+    navigateToView(entry.view, entry.scrollId);
+  };
+
+  return (
+    <section className="panel transformation-compass-panel" aria-label="用户状态入口和国际标杆目标">
+      <div className="need-entry-zone">
+        <div className="panel-kicker">从用户当前问题出发</div>
+        <h2>我现在卡在哪里？</h2>
+        <p>不要求用户先理解完整体系。先选择当前最真实的问题，平台直接给出下一步路径。</p>
+        <div className="need-entry-grid">
+          {userNeedEntries.map((entry) => (
+            <button
+              key={entry.id}
+              className={check.selectedNeed === entry.id ? "need-entry-card active" : "need-entry-card"}
+              onClick={() => handleEntry(entry)}
+            >
+              <strong>{entry.title}</strong>
+              <span>{entry.body}</span>
+              <em>{entry.action}</em>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="benchmark-zone">
+        <div className="panel-kicker">国际标杆目标</div>
+        <h3>不是做更多功能，而是做到每天愿意回来</h3>
+        <div className="benchmark-list">
+          {internationalProductGoals.map((item) => (
+            <article key={item.platform}>
+              <span>{item.platform}</span>
+              <strong>{item.goal}</strong>
+              <p>{item.lesson}</p>
             </article>
           ))}
         </div>
