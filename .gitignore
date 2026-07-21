@@ -5,20 +5,7 @@ dist/
 .env.*
 .playwright-mcp/
 tmp/
-output/
 *.log
-
-# Local source materials and screenshots that are not needed for the website build.
-*.pdf
-*.jpg
-*.jpeg
-*.png
-!public/**/*.jpg
-!public/**/*.jpeg
-!public/**/*.png
-!public/**/*.pdf
-!wechat-miniprogram/assets/
-!wechat-miniprogram/assets/**/*.png
 
 # WeChat DevTools local machine settings.
 wechat-miniprogram/project.private.config.json
