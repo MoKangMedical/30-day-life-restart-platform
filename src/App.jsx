@@ -880,6 +880,7 @@ function App() {
   const [activeCourseId, setActiveCourseId] = useState(systemCourseCatalog[0].id);
   const [activeView, setActiveView] = useState(getViewFromHash);
   const [pendingScroll, setPendingScroll] = useState(null);
+  const [advancedToolsOpen, setAdvancedToolsOpen] = useState(false);
 
   const activeProgram = programDays[activeDay - 1];
   const activeSystem = systems.find((system) => system.id === activeSystemId) ?? systems[0];
@@ -1136,6 +1137,19 @@ function App() {
     }
   };
 
+  const openAdvancedTool = (scrollId = "") => {
+    setAdvancedToolsOpen(true);
+    navigateToView("dashboard", scrollId);
+  };
+
+  const openPreferenceMap = () => {
+    if (needsPreferenceMap) {
+      navigateToView("dashboard", "preference-map");
+      return;
+    }
+    openAdvancedTool("preference-map");
+  };
+
   const completeAndShowNext = () => {
     completeActiveDay();
     navigateToView("dashboard", "today-action-panel");
@@ -1300,6 +1314,7 @@ function App() {
         onOpenDashboard={() => navigateToView("dashboard", "today-action-panel")}
         onOpenLearning={() => navigateToView("learning")}
         onOpenCourses={() => navigateToView("courses", "system-course-detail")}
+        onOpenGroup={() => navigateToView("group")}
       />
     );
   }
@@ -1429,6 +1444,22 @@ function App() {
             taskTotal={taskTotal}
             streak={streak}
             onNextAction={handleNextAction}
+            navigateToView={navigateToView}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <GrowthHubPanel
+            state={state}
+            activeDay={activeDay}
+            check={check}
+            taskDoneCount={taskDoneCount}
+            taskTotal={taskTotal}
+            score={score}
+            systemCourseProgress={systemCourseProgress}
+            needsPreferenceMap={needsPreferenceMap}
+            onOpenPreferenceMap={openPreferenceMap}
+            onOpenAdvancedTool={openAdvancedTool}
             navigateToView={navigateToView}
           />
         )}
@@ -1576,12 +1607,20 @@ function App() {
         )}
 
         {activeView === "dashboard" && (
-          <details className="advanced-tools-panel">
+          <details className="advanced-tools-panel" open={advancedToolsOpen} onToggle={(event) => setAdvancedToolsOpen(event.currentTarget.open)}>
             <summary>
               <span>需要更多支持？</span>
               <em>课程、账户、提醒、目标和更深入的工具都在这里</em>
             </summary>
             <div className="advanced-tools-content">
+              {!needsPreferenceMap && (
+                <PreferenceMapPanel
+                  state={state}
+                  setState={setState}
+                  activeDay={activeDay}
+                  openSystem={openSystem}
+                />
+              )}
               <AudienceCampaignPanel
                 campaignId={state.onboarding?.campaignId}
                 onBrowse={() => navigateToView("campaign", "campaign-hero")}
@@ -2322,7 +2361,7 @@ function QuestDrivePanel({
   ];
 
   return (
-    <section className="quest-drive-panel" aria-label="重启远征任务系统">
+    <section className="quest-drive-panel" id="quest-drive" aria-label="重启远征任务系统">
       <div className="quest-drive-header">
         <div>
           <span>NEWLIFE30 QUEST ENGINE</span>
@@ -2450,6 +2489,119 @@ function RetentionEnginePanel({
   );
 }
 
+function GrowthHubPanel({
+  state,
+  activeDay,
+  check,
+  taskDoneCount,
+  taskTotal,
+  score,
+  systemCourseProgress,
+  needsPreferenceMap,
+  onOpenPreferenceMap,
+  onOpenAdvancedTool,
+  navigateToView,
+}) {
+  const level = getQuestLevel(score.totalScore);
+  const goalMap = state.goalMap ?? {};
+  const group = state.group ?? {};
+  const review = state.outcomeReview ?? {};
+  const goalReady = Boolean(goalMap.outcome?.trim() && goalMap.dailyAction?.trim());
+  const reviewStarted = Boolean(review.biggestGain?.trim() || review.breakPoint?.trim() || review.nextExperiment?.trim());
+  const taskPercent = taskTotal ? Math.round((taskDoneCount / taskTotal) * 100) : 0;
+  const capabilities = [
+    {
+      eyebrow: "个性化起点",
+      title: needsPreferenceMap ? "找到适合你的启动方式" : "你的训练偏好正在校正",
+      body: needsPreferenceMap
+        ? "用行动偏好地图调整课程顺序、提醒节奏与支持方式，不用被固定类型定义。"
+        : "系统会结合真实完成、状态记录与复盘，持续更新下一阶段的训练建议。",
+      status: needsPreferenceMap ? "待完成偏好图" : "偏好图已建立",
+      Icon: Brain,
+      action: onOpenPreferenceMap,
+      actionLabel: needsPreferenceMap ? "建立我的起点" : "查看偏好图",
+    },
+    {
+      eyebrow: "目标到行动",
+      title: goalReady ? "你的30天目标已接入今日" : "把愿景拆成今天的一个动作",
+      body: goalReady
+        ? "成果、每周里程碑和今天的关键动作已形成连接。"
+        : "不做空泛计划。用成果、里程碑和今日动作建立可以回看的执行链。",
+      status: goalReady ? "目标链已建立" : "待写下目标",
+      Icon: Target,
+      action: () => onOpenAdvancedTool("goal-map"),
+      actionLabel: goalReady ? "调整目标地图" : "建立30天目标",
+    },
+    {
+      eyebrow: "任务与激励",
+      title: `Lv.${level.level} ${level.title} · ${score.totalScore} XP`,
+      body: `今天已完成 ${taskPercent}% 任务。XP、连胜和徽章只记录已发生的行动，不鼓励为了刷分而行动。`,
+      status: check.completed ? "今日任务已结算" : `还有 ${Math.max(taskTotal - taskDoneCount, 0)} 个动作`,
+      Icon: Award,
+      action: () => onOpenAdvancedTool("quest-drive"),
+      actionLabel: "查看任务与徽章",
+    },
+    {
+      eyebrow: "精品课程",
+      title: "学习必须转成一次真实应用",
+      body: `${systemCourseProgress.completedLessons}/${systemCourseProgress.totalLessons} 节系统课已完成。课程、音频与练习统一回到今天的行动。`,
+      status: systemCourseProgress.completedLessons ? "已有学习沉淀" : "从第一节系统课开始",
+      Icon: BookOpen,
+      action: () => navigateToView("courses", "system-course-detail"),
+      actionLabel: "进入精品课程",
+    },
+    {
+      eyebrow: "同伴陪跑",
+      title: `${group.name || "我的小组"} · 用外部支持保护行动`,
+      body: "把卡点、反馈和真实记录带进小组。支持、责任和回声比单纯排行榜更能帮助人持续。",
+      status: check.groupFullAttendance ? "今日小组回声已记录" : "等待一次同伴连接",
+      Icon: UsersRound,
+      action: () => navigateToView("group"),
+      actionLabel: "进入小组陪跑",
+    },
+    {
+      eyebrow: "复盘与报告",
+      title: reviewStarted ? "你的变化正在沉淀成报告" : `Day ${activeDay} 开始留下改变证据`,
+      body: "每周识别一次真实变化、一个断点和一条微调。Day 30 会生成个人运行系统报告。",
+      status: reviewStarted ? "已留下复盘证据" : "待完成阶段复盘",
+      Icon: LineChart,
+      action: () => onOpenAdvancedTool("outcome-ledger"),
+      actionLabel: "打开成长报告",
+    },
+  ];
+
+  return (
+    <section className="growth-hub-panel" id="growth-hub" aria-label="NewLife30 综合成长能力">
+      <div className="growth-hub-head">
+        <div>
+          <span>ONE INTEGRATED GROWTH SYSTEM</span>
+          <h2>从想改变，到真正做得到。</h2>
+          <p>NewLife30 将个性化推荐、目标路径、任务激励、精品学习、同伴陪跑和成果复盘放进同一条30天闭环。</p>
+        </div>
+        <div className="growth-hub-signal">
+          <Sparkles size={20} />
+          <span>你的下一步由真实记录决定</span>
+        </div>
+      </div>
+      <div className="growth-capability-grid">
+        {capabilities.map((capability) => {
+          const CapabilityIcon = capability.Icon;
+          return (
+            <article key={capability.eyebrow}>
+              <div className="growth-capability-icon"><CapabilityIcon size={19} /></div>
+              <span>{capability.eyebrow}</span>
+              <h3>{capability.title}</h3>
+              <p>{capability.body}</p>
+              <em>{capability.status}</em>
+              <button onClick={capability.action}>{capability.actionLabel} <ChevronRight size={15} /></button>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function UserPathPanel({
   activeDay,
   todayDay,
@@ -2566,7 +2718,7 @@ function UserPathPanel({
   );
 }
 
-function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, onOpenCourses }) {
+function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, onOpenCourses, onOpenGroup }) {
   const journeyHighlights = [
     ["01", "找到起点", "30 秒识别当前最卡的一环，获得第一条具体建议。", "#f2a11a", Target],
     ["02", "清晰路径", "四个阶段、八个系统，知道此刻练什么、为什么练。", "#3f7bea", Route],
@@ -2584,6 +2736,14 @@ function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, 
     ["阶段 2", "建立行动", "目标行动系统 · 反馈进化系统", "把模糊感受变成今天能完成的一个动作。", onOpenDashboard, "开始今日行动"],
     ["阶段 3", "扩展能力", "认知学习系统 · 沟通关系系统", "让学习和关系成为长期成长的支持。", onOpenCourses, "进入精品课程"],
     ["阶段 4", "形成方向", "价值资源系统 · 身份意义系统", "把时间、资源和选择带回真正重要的方向。", onOpenLearning, "查看30天路径"],
+  ];
+  const capabilityPreview = [
+    ["个性化起点", "用行动偏好地图校准课程顺序、提醒节奏和支持方式。", Brain, () => onStart(), "开始自测"],
+    ["目标行动链", "把30天成果、每周里程碑和今日一个动作连成闭环。", Target, onOpenDashboard, "建立目标"],
+    ["任务与激励", "每日任务、XP、连胜和徽章只记录真实发生的行动。", Award, onOpenDashboard, "查看任务"],
+    ["精品内容", "系统课程、音频与练习每次都回到一个真实应用。", BookOpen, onOpenCourses, "进入课程"],
+    ["同伴陪跑", "用小组反馈、支持与责任保护你不在中断后消失。", UsersRound, onOpenGroup, "进入小组"],
+    ["成长报告", "用每周复盘和Day 30报告，把改变沉淀为个人运行手册。", LineChart, onOpenDashboard, "查看报告"],
   ];
 
   return (
@@ -2658,6 +2818,26 @@ function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, 
                 <Icon size={27} />
                 <div><span>{number}</span><strong>{title}</strong></div>
                 <p>{body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="landing-capability-section" aria-label="NewLife30 综合成长能力">
+          <div className="landing-section-head">
+            <div>
+              <span>ONE PLATFORM, ONE COMPLETE LOOP</span>
+              <h2>不是又一个打卡工具，而是一套完整的个人成长系统。</h2>
+            </div>
+            <p>我们吸收成熟成长平台的有效机制，但所有能力都服务一个目标：帮助你在真实生活里持续发生改变。</p>
+          </div>
+          <div className="landing-capability-grid">
+            {capabilityPreview.map(([title, body, Icon, action, actionLabel]) => (
+              <article key={title}>
+                <Icon size={22} />
+                <h3>{title}</h3>
+                <p>{body}</p>
+                <button onClick={action}>{actionLabel} <ChevronRight size={15} /></button>
               </article>
             ))}
           </div>

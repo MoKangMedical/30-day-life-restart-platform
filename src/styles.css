@@ -9712,6 +9712,184 @@ body {
   .landing-phase-card { min-height: 0; }
 }
 
+/* Integrated growth loop: personalization, action, learning, peers, and evidence. */
+.growth-hub-panel {
+  margin: 28px 0;
+  padding: 30px 0 0;
+  border-top: 1px solid #dfe8f4;
+}
+
+.growth-hub-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  align-items: end;
+  padding: 0 4px 22px;
+}
+
+.growth-hub-head > div:first-child { max-width: 750px; }
+.growth-hub-head > div:first-child > span {
+  color: #2f68e8;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.growth-hub-head h2 {
+  margin: 9px 0 0;
+  color: #162846;
+  font-size: clamp(26px, 2.4vw, 37px);
+  line-height: 1.2;
+}
+
+.growth-hub-head p {
+  max-width: 700px;
+  margin: 11px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.growth-hub-signal {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 10px 12px;
+  color: #31705a;
+  background: #eef8f3;
+  border: 1px solid #d4eadc;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.growth-capability-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid #dfe8f4;
+  border-left: 1px solid #dfe8f4;
+}
+
+.growth-capability-grid article {
+  position: relative;
+  min-height: 258px;
+  padding: 23px;
+  background: #ffffff;
+  border-right: 1px solid #dfe8f4;
+  border-bottom: 1px solid #dfe8f4;
+}
+
+.growth-capability-icon {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  color: #2f68e8;
+  background: #edf4ff;
+  border: 1px solid #d7e7ff;
+  border-radius: 7px;
+}
+
+.growth-capability-grid article > span {
+  display: block;
+  margin-top: 17px;
+  color: #4974bd;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.growth-capability-grid h3 {
+  margin: 7px 0 0;
+  color: #172949;
+  font-size: 19px;
+  line-height: 1.38;
+}
+
+.growth-capability-grid p {
+  min-height: 58px;
+  margin: 10px 0 0;
+  color: #65758b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.growth-capability-grid em {
+  display: block;
+  margin-top: 11px;
+  color: #2d8a68;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.growth-capability-grid button {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 15px;
+  padding: 0;
+  color: #285fc7;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.growth-capability-grid button:hover { color: #173f8b; }
+
+.landing-capability-section {
+  padding: 84px clamp(24px, 7vw, 132px);
+  background: #f7faff;
+}
+
+.landing-capability-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.landing-capability-grid article {
+  min-height: 220px;
+  padding: 23px;
+  background: #ffffff;
+  border: 1px solid #dfe8f4;
+  border-radius: 8px;
+}
+
+.landing-capability-grid article > svg { color: #2f68e8; }
+.landing-capability-grid h3 { margin: 15px 0 0; color: #192d4d; font-size: 20px; }
+.landing-capability-grid p { margin: 10px 0 0; color: #667891; font-size: 14px; line-height: 1.7; }
+.landing-capability-grid button {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 0;
+  color: #2864d0;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@media (max-width: 920px) {
+  .growth-hub-head { display: grid; gap: 17px; align-items: start; }
+  .growth-hub-signal { width: fit-content; }
+  .growth-capability-grid,
+  .landing-capability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .growth-hub-panel { margin: 22px 0; padding-top: 23px; }
+  .growth-hub-head { padding-bottom: 17px; }
+  .growth-hub-head h2 { font-size: 26px; }
+  .growth-hub-head p { font-size: 13px; }
+  .growth-capability-grid,
+  .landing-capability-grid { grid-template-columns: 1fr; }
+  .growth-capability-grid article { min-height: 0; }
+  .growth-capability-grid p { min-height: 0; }
+  .landing-capability-section { padding: 58px 20px; }
+  .landing-capability-grid article { min-height: 0; }
+}
+
 @media (max-width: 1120px) {
   .landing-nav,
   .landing-hero,

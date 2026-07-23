@@ -62,4 +62,12 @@ No actionable P0, P1, or P2 findings remain for the requested landing-page direc
 - Each phase card leads to a real destination: recovery opens systems, action opens today, capability opens courses, and direction opens the 30-day path.
 - Browser verification: the `开始30秒系统自测` button routed to `#/today` and displayed the restart assessment; the roadmap image rendered once; desktop and 390px mobile screenshots showed no title/button overlap; browser console errors were empty.
 
+## Integrated Growth Capability Refresh
+
+- NewLife30 now presents its combined growth loop as six connected, actionable capabilities: personalized starting point, goal-to-action mapping, task and reward feedback, premium courses, peer support, and outcome reporting.
+- The capability model deliberately keeps the useful patterns previously studied in international growth products while keeping NewLife30's own differentiation: 30-day structured delivery, adaptive action preferences, local-life task design, evidence-based XP, and small-group accountability.
+- The homepage explains all six capabilities without turning the hero into a feature catalogue. The daily workspace now exposes a progress-aware growth hub instead of hiding the full product system behind a generic advanced-tools label.
+- Every hub action was wired to a real surface: preference map, goal map, quest engine, course workbench, group space, or outcome ledger. The goal and quest buttons were browser-tested and automatically opened the corresponding advanced tool.
+- Responsive verification: desktop uses a three-column capability grid; 390px mobile uses a single-column flow. No browser console errors were observed.
+
 final result: passed
