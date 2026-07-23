@@ -98,17 +98,98 @@ const iconMap = {
   Sparkles,
 };
 
-const viewLabels = [
-  { id: "landing", label: "首页" },
-  { id: "dashboard", label: "今天要做" },
-  { id: "nutrition", label: "睡眠饮食" },
-  { id: "courses", label: "系统课程" },
-  { id: "learning", label: "学习路径" },
-  { id: "group", label: "群内打卡" },
-  { id: "systems", label: "八大系统" },
-  { id: "campaign", label: "30天训练营" },
-  { id: "theory", label: "为什么练" },
-];
+const routeDefinitions = {
+  landing: {
+    path: "/",
+    label: "首页",
+    eyebrow: "NEWLIFE30",
+    title: "从一个真实问题开始",
+    description: "不用先学完所有内容。先确认你现在最想改善的状态，再进入当天的最小行动。",
+    nextView: "dashboard",
+    nextLabel: "进入今天的行动",
+  },
+  dashboard: {
+    path: "/today",
+    label: "今天",
+    eyebrow: "今天的行动",
+    title: "今天只做这一组动作",
+    description: "先完成今天的任务、记录真实状态、留下复盘。其他功能只在你需要时打开。",
+    nextView: "learning",
+    nextLabel: "查看 30 天路径",
+  },
+  learning: {
+    path: "/path",
+    label: "30 天路径",
+    eyebrow: "训练路线",
+    title: "知道现在在哪，也知道下一步去哪",
+    description: "按天查看训练主题、当日输出与练习安排。完成一段，再进入下一段。",
+    nextView: "courses",
+    nextLabel: "选择一门课程",
+  },
+  courses: {
+    path: "/courses",
+    label: "精品课程",
+    eyebrow: "学习与练习",
+    title: "每门课都对应一个可执行改变",
+    description: "选择你当前最需要的系统课，完成学习、练习和一次真实应用。",
+    nextView: "dashboard",
+    nextLabel: "回到今天行动",
+  },
+  group: {
+    path: "/review",
+    label: "记录与复盘",
+    eyebrow: "记录与陪伴",
+    title: "把行动留下来，才看得见改变",
+    description: "在这里完成打卡、同伴互动和周期复盘，不需要写得完美，只要保持连接。",
+    nextView: "dashboard",
+    nextLabel: "完成今日打卡",
+  },
+  systems: {
+    path: "/systems",
+    label: "八大系统",
+    eyebrow: "个人运行系统",
+    title: "不是补一张计划表，而是补齐运行环节",
+    description: "从身心能量到反馈进化，选择你最需要先修复的一环，再进入对应训练。",
+    nextView: "courses",
+    nextLabel: "学习对应课程",
+  },
+  nutrition: {
+    path: "/body",
+    label: "身体底盘",
+    eyebrow: "身体底盘",
+    title: "先让睡眠和饮食支持你的行动",
+    description: "用轻量记录识别最薄弱的一环，为明天写下一条具体可执行的微调。",
+    nextView: "dashboard",
+    nextLabel: "回到今日行动",
+  },
+  campaign: {
+    path: "/programs",
+    label: "训练营选择",
+    eyebrow: "训练营",
+    title: "选择最贴近你当前状态的一条训练线",
+    description: "每条训练营都有明确的起点、30 天行动安排和结业成果，不需要一次做完所有事。",
+    nextView: "dashboard",
+    nextLabel: "开始今天的训练",
+  },
+  theory: {
+    path: "/method",
+    label: "方法与依据",
+    eyebrow: "训练方法",
+    title: "先理解方法，再把它用在今天",
+    description: "这里解释平台为什么这样设计。阅读后回到今天的行动，把理解变成一次实践。",
+    nextView: "dashboard",
+    nextLabel: "回到今天行动",
+  },
+};
+
+const primaryViewIds = ["dashboard", "learning", "courses", "group", "systems"];
+const secondaryViewIds = ["nutrition", "campaign", "theory"];
+
+function getViewFromHash() {
+  if (typeof window === "undefined") return "landing";
+  const requestedPath = window.location.hash.replace(/^#/, "") || "/";
+  return Object.entries(routeDefinitions).find(([, route]) => route.path === requestedPath)?.[0] ?? "landing";
+}
 
 function getLocalDate() {
   const now = new Date();
@@ -797,7 +878,7 @@ function App() {
   const [activeDay, setActiveDay] = useState(todayDay);
   const [activeSystemId, setActiveSystemId] = useState(programDays[todayDay - 1].systemId);
   const [activeCourseId, setActiveCourseId] = useState(systemCourseCatalog[0].id);
-  const [activeView, setActiveView] = useState("landing");
+  const [activeView, setActiveView] = useState(getViewFromHash);
   const [pendingScroll, setPendingScroll] = useState(null);
 
   const activeProgram = programDays[activeDay - 1];
@@ -818,6 +899,18 @@ function App() {
     return Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10;
   }, [state.checks]);
   const streak = calculateStreak(state.checks);
+  const route = routeDefinitions[activeView] ?? routeDefinitions.landing;
+  const needsStartingPoint = !state.onboarding?.entryStateId;
+  const needsPreferenceMap = !state.preferenceMap?.completedAt;
+
+  useEffect(() => {
+    const syncRouteFromAddress = () => {
+      setActiveView(getViewFromHash());
+      setPendingScroll(null);
+    };
+    window.addEventListener("hashchange", syncRouteFromAddress);
+    return () => window.removeEventListener("hashchange", syncRouteFromAddress);
+  }, []);
 
   useEffect(() => {
     if (!cloudConfigured) return undefined;
@@ -1034,8 +1127,13 @@ function App() {
   };
 
   const navigateToView = (viewId, scrollId = "") => {
+    const targetRoute = routeDefinitions[viewId] ?? routeDefinitions.landing;
     setActiveView(viewId);
     setPendingScroll(scrollId ? { id: scrollId, viewId } : null);
+    const targetHash = `#${targetRoute.path}`;
+    if (window.location.hash !== targetHash) {
+      window.history.pushState(null, "", targetHash);
+    }
   };
 
   const completeAndShowNext = () => {
@@ -1200,6 +1298,8 @@ function App() {
         onStart={startFromLanding}
         onOpenSystems={() => navigateToView("systems", "system-detail-panel")}
         onOpenDashboard={() => navigateToView("dashboard", "today-action-panel")}
+        onOpenLearning={() => navigateToView("learning")}
+        onOpenCourses={() => navigateToView("courses", "system-course-detail")}
       />
     );
   }
@@ -1216,7 +1316,7 @@ function App() {
         </div>
 
         <div className="start-date">
-          <label htmlFor="startDate">开始日期</label>
+          <label htmlFor="startDate">我的训练 · Day {todayDay}</label>
           <input
             id="startDate"
             type="date"
@@ -1231,34 +1331,54 @@ function App() {
           />
         </div>
 
-        <nav className="view-nav" aria-label="平台模块">
-          {viewLabels.map((view) => (
+        <nav className="view-nav" aria-label="主要任务">
+          {primaryViewIds.map((viewId) => {
+            const view = routeDefinitions[viewId];
+            return (
             <button
-              key={view.id}
-              className={activeView === view.id ? "nav-pill active" : "nav-pill"}
-              onClick={() => navigateToView(view.id)}
+              key={viewId}
+              className={activeView === viewId ? "nav-pill active" : "nav-pill"}
+              onClick={() => navigateToView(viewId)}
             >
               {view.label}
             </button>
-          ))}
-        </nav>
-
-        <div className="system-nav">
-          <p className="side-label">八个个人运行系统</p>
-          {systems.map((system) => {
-            const Icon = iconMap[system.icon];
-            return (
-              <button
-                key={system.id}
-                className={activeSystemId === system.id ? "system-link active" : "system-link"}
-                onClick={() => openSystem(system.id)}
-              >
-                <Icon size={18} strokeWidth={2} />
-                <span>{system.name}</span>
-              </button>
             );
           })}
-        </div>
+        </nav>
+
+        <details className="sidebar-more">
+          <summary>更多工具</summary>
+          <div className="sidebar-more-links">
+            {secondaryViewIds.map((viewId) => {
+              const view = routeDefinitions[viewId];
+              return (
+                <button
+                  key={viewId}
+                  className={activeView === viewId ? "nav-pill active" : "nav-pill"}
+                  onClick={() => navigateToView(viewId)}
+                >
+                  {view.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="system-nav">
+            <p className="side-label">按系统进入</p>
+            {systems.map((system) => {
+              const Icon = iconMap[system.icon];
+              return (
+                <button
+                  key={system.id}
+                  className={activeSystemId === system.id ? "system-link active" : "system-link"}
+                  onClick={() => openSystem(system.id)}
+                >
+                  <Icon size={18} strokeWidth={2} />
+                  <span>{system.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </details>
 
         <button className="reset-button" onClick={resetData}>
           <RotateCcw size={16} />
@@ -1269,21 +1389,31 @@ function App() {
       <main className="workspace">
         <header className="topbar">
           <div>
-            <span className="overline">从今天开始，为更好的自己坚持 30 天</span>
-            <h1>30天重建人生体系</h1>
+            <span className="overline">{route.eyebrow} · {route.path}</span>
+            <h1>{route.title}</h1>
+            <p className="route-description">{route.description}</p>
           </div>
           <div className="top-actions">
-            <button
-              className={state.pledgeAccepted ? "pledge-button accepted" : "pledge-button"}
-              onClick={togglePledge}
-            >
-              <ShieldCheck size={18} />
-              {state.pledgeAccepted ? "承诺已确认" : "确认承诺"}
-            </button>
-            <button className="primary-action" onClick={completeAndShowNext}>
-              <Save size={18} />
-              完成今日打卡
-            </button>
+            {activeView === "dashboard" ? (
+              <>
+                <button
+                  className={state.pledgeAccepted ? "pledge-button accepted" : "pledge-button"}
+                  onClick={togglePledge}
+                >
+                  <ShieldCheck size={18} />
+                  {state.pledgeAccepted ? "承诺已确认" : "确认承诺"}
+                </button>
+                <button className="primary-action" onClick={completeAndShowNext}>
+                  <Save size={18} />
+                  完成今日打卡
+                </button>
+              </>
+            ) : (
+              <button className="primary-action" onClick={() => navigateToView(route.nextView)}>
+                <ChevronRight size={18} />
+                {route.nextLabel}
+              </button>
+            )}
           </div>
         </header>
 
@@ -1303,31 +1433,7 @@ function App() {
           />
         )}
 
-        {activeView === "dashboard" && (
-          <AudienceCampaignPanel
-            campaignId={state.onboarding?.campaignId}
-            onBrowse={() => navigateToView("campaign", "campaign-hero")}
-            onChooseCampaign={chooseCampaign}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <PromoVideoPanel
-            navigateToView={navigateToView}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <TransformationCompassPanel
-            activeDay={activeDay}
-            check={check}
-            updateCheck={updateCheck}
-            navigateToView={navigateToView}
-            openSystem={openSystem}
-          />
-        )}
-
-        {activeView === "dashboard" && (
+        {activeView === "dashboard" && needsStartingPoint && (
           <RestartAssessmentPanel
             state={state}
             setState={setState}
@@ -1337,44 +1443,13 @@ function App() {
           />
         )}
 
-        {activeView === "dashboard" && (
+        {activeView === "dashboard" && needsPreferenceMap && (
           <PreferenceMapPanel
             state={state}
             setState={setState}
             activeDay={activeDay}
             openSystem={openSystem}
           />
-        )}
-
-        {activeView === "dashboard" && (
-          <GoalMapPanel
-            state={state}
-            setState={setState}
-            activeDay={activeDay}
-            activeProgram={activeProgram}
-            check={check}
-            updateCheck={updateCheck}
-            navigateToView={navigateToView}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <AccountCloudPanel
-            configured={cloudConfigured}
-            session={cloudSession}
-            cloud={state.cloud}
-            notice={cloudNotice}
-            onSendPhoneOtp={handlePhoneOtp}
-            onVerifyPhoneOtp={handleVerifyPhoneOtp}
-            onWechatLogin={handleWechatLogin}
-            onEnableSync={enableCloudSync}
-            onRestore={restoreCloudProgress}
-            onSignOut={handleSignOut}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <ReminderCenterPanel state={state} setState={setState} activeDay={activeDay} />
         )}
 
         {activeView === "dashboard" && (
@@ -1399,57 +1474,6 @@ function App() {
             score={score}
             streak={streak}
             averageEnergy={averageEnergy}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <QuestDrivePanel
-            activeDay={activeDay}
-            activeProgram={activeProgram}
-            check={check}
-            taskDoneCount={taskDoneCount}
-            taskTotal={taskTotal}
-            score={score}
-            systemCourseProgress={systemCourseProgress}
-            streak={streak}
-            navigateToView={navigateToView}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <RetentionEnginePanel
-            activeDay={activeDay}
-            activeProgram={activeProgram}
-            check={check}
-            taskDoneCount={taskDoneCount}
-            taskTotal={taskTotal}
-            streak={streak}
-            updateCheck={updateCheck}
-            navigateToView={navigateToView}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <ProgressStats
-            score={score}
-            todayDay={todayDay}
-            streak={streak}
-            averageEnergy={averageEnergy}
-            systemCourseProgress={systemCourseProgress}
-            navigateToView={navigateToView}
-          />
-        )}
-
-        {activeView === "dashboard" && (
-          <OutcomeLedgerPanel
-            state={state}
-            setState={setState}
-            activeDay={activeDay}
-            score={score}
-            streak={streak}
-            averageEnergy={averageEnergy}
-            systemCourseProgress={systemCourseProgress}
-            navigateToView={navigateToView}
           />
         )}
 
@@ -1548,22 +1572,107 @@ function App() {
               </label>
             </section>
 
-            <CheckinModesPanel
-              activeDay={activeDay}
-              check={check}
-              updateCheckinTemplate={updateCheckinTemplate}
-            />
-
-            <LearningMechanism
-              state={state}
-              toggleCourse={toggleCourse}
-              updateCheck={updateCheck}
-              activeDay={activeDay}
-              check={check}
-            />
-
-            <CommitmentPanel state={state} setState={setState} />
           </div>
+        )}
+
+        {activeView === "dashboard" && (
+          <details className="advanced-tools-panel">
+            <summary>
+              <span>需要更多支持？</span>
+              <em>课程、账户、提醒、目标和更深入的工具都在这里</em>
+            </summary>
+            <div className="advanced-tools-content">
+              <AudienceCampaignPanel
+                campaignId={state.onboarding?.campaignId}
+                onBrowse={() => navigateToView("campaign", "campaign-hero")}
+                onChooseCampaign={chooseCampaign}
+              />
+              <PromoVideoPanel navigateToView={navigateToView} />
+              <TransformationCompassPanel
+                activeDay={activeDay}
+                check={check}
+                updateCheck={updateCheck}
+                navigateToView={navigateToView}
+                openSystem={openSystem}
+              />
+              <GoalMapPanel
+                state={state}
+                setState={setState}
+                activeDay={activeDay}
+                activeProgram={activeProgram}
+                check={check}
+                updateCheck={updateCheck}
+                navigateToView={navigateToView}
+              />
+              <AccountCloudPanel
+                configured={cloudConfigured}
+                session={cloudSession}
+                cloud={state.cloud}
+                notice={cloudNotice}
+                onSendPhoneOtp={handlePhoneOtp}
+                onVerifyPhoneOtp={handleVerifyPhoneOtp}
+                onWechatLogin={handleWechatLogin}
+                onEnableSync={enableCloudSync}
+                onRestore={restoreCloudProgress}
+                onSignOut={handleSignOut}
+              />
+              <ReminderCenterPanel state={state} setState={setState} activeDay={activeDay} />
+              <QuestDrivePanel
+                activeDay={activeDay}
+                activeProgram={activeProgram}
+                check={check}
+                taskDoneCount={taskDoneCount}
+                taskTotal={taskTotal}
+                score={score}
+                systemCourseProgress={systemCourseProgress}
+                streak={streak}
+                navigateToView={navigateToView}
+              />
+              <RetentionEnginePanel
+                activeDay={activeDay}
+                activeProgram={activeProgram}
+                check={check}
+                taskDoneCount={taskDoneCount}
+                taskTotal={taskTotal}
+                streak={streak}
+                updateCheck={updateCheck}
+                navigateToView={navigateToView}
+              />
+              <ProgressStats
+                score={score}
+                todayDay={todayDay}
+                streak={streak}
+                averageEnergy={averageEnergy}
+                systemCourseProgress={systemCourseProgress}
+                navigateToView={navigateToView}
+              />
+              <OutcomeLedgerPanel
+                state={state}
+                setState={setState}
+                activeDay={activeDay}
+                score={score}
+                streak={streak}
+                averageEnergy={averageEnergy}
+                systemCourseProgress={systemCourseProgress}
+                navigateToView={navigateToView}
+              />
+              <div className="dashboard-grid advanced-tools-grid">
+                <CheckinModesPanel
+                  activeDay={activeDay}
+                  check={check}
+                  updateCheckinTemplate={updateCheckinTemplate}
+                />
+                <LearningMechanism
+                  state={state}
+                  toggleCourse={toggleCourse}
+                  updateCheck={updateCheck}
+                  activeDay={activeDay}
+                  check={check}
+                />
+                <CommitmentPanel state={state} setState={setState} />
+              </div>
+            </div>
+          </details>
         )}
 
         {activeView === "theory" && <TheoryView navigateToView={navigateToView} />}
@@ -2457,7 +2566,7 @@ function UserPathPanel({
   );
 }
 
-function LandingHome({ onStart, onOpenSystems, onOpenDashboard }) {
+function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, onOpenCourses }) {
   const journeyHighlights = [
     ["01", "先看见问题", "从睡眠、精力、节律或行动阻力中，确认当下最需要先处理的一件事。", "#f6a11a"],
     ["02", "再进入 30 天", "每天只做一组可检查任务，配合打卡、复盘和同伴支持，不靠意志硬撑。", "#17a862"],
@@ -2472,11 +2581,11 @@ function LandingHome({ onStart, onOpenSystems, onOpenDashboard }) {
           <strong>NewLife30</strong>
         </button>
         <nav aria-label="首页导航">
-          <button onClick={() => scrollToId("landing-concept")}>产品理念</button>
-          <button onClick={() => scrollToId("landing-journey")}>30天路线图</button>
-          <button onClick={() => scrollToId("landing-systems")}>八大系统</button>
+          <button onClick={onOpenLearning}>30天路径</button>
+          <button onClick={onOpenCourses}>精品课程</button>
+          <button onClick={onOpenSystems}>八大系统</button>
         </nav>
-        <button className="landing-workbench-button" onClick={onOpenDashboard}>进入我的工作台</button>
+        <button className="landing-workbench-button" onClick={onOpenDashboard}>继续今天的训练</button>
       </header>
 
       <main>
@@ -2487,7 +2596,7 @@ function LandingHome({ onStart, onOpenSystems, onOpenDashboard }) {
             <p>融合行为科学、每日打卡、身心记录与社群监督，先稳定节奏，再让行动真正发生。</p>
             <div className="landing-hero-actions">
               <button className="landing-primary-button" onClick={() => onStart()}>
-                开启 30 天重塑之旅 <ChevronRight size={19} />
+                从今天开始 <ChevronRight size={19} />
               </button>
               <button className="landing-secondary-button" onClick={() => scrollToId("landing-journey")}>
                 <MonitorPlay size={19} /> 查看运作机制

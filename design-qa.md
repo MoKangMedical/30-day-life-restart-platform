@@ -46,4 +46,12 @@ No actionable P0, P1, or P2 findings remain for the requested landing-page direc
 - Browser smoke test: landing to workbench navigation succeeded; account boundary, reminder center, and Day 1 checkpoint were present; the Day 1 badge changed to claimed state; browser console errors were empty.
 - Production DNS check: `newlife30.cn` and `www.newlife30.cn` serve/redirect correctly. The `.com` Nginx redirect is ready and locally verified with Host routing, but its public DNS and TLS certificate remain blocked until the registrar points both `.com` names to the production server.
 
+## Guided URL and task-flow verification
+
+- Public task URLs are now stable hash routes: `#/today`, `#/path`, `#/courses`, `#/review`, `#/systems`, `#/body`, `#/programs`, and `#/method`.
+- Every task route now opens with a plain-language question, one sentence explaining what to do on that page, and one clear next action.
+- The workspace primary navigation is reduced to five user goals: today, 30-day path, premium courses, records and review, and the eight systems. Supporting functions are available under `more tools` rather than competing with the daily action.
+- The today page retains the daily route, check-in, engagement feedback, milestone checkpoint, and task list. Campaigns, media, account, reminders, game mechanics, goal planning, and deeper tools are preserved behind one explicit expandable section.
+- Browser smoke test: direct navigation to `#/today`, `#/path`, `#/courses`, `#/review`, and `#/systems` rendered the matching route title. The main navigation updated the address from `#/today` to `#/path`; the advanced-tools panel opened and exposed reminder and goal tools. Browser console errors: none.
+
 final result: passed
