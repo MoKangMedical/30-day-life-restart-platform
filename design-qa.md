@@ -36,6 +36,14 @@ No actionable P0, P1, or P2 findings remain for the requested landing-page direc
 ## Follow-up polish
 
 - P3: capture an actual narrow mobile browser viewport after the final content copy is approved.
-- P3: connect the `登录 / 注册` style entry to the eventual real account flow instead of routing it to the current workbench.
+- P3: supply the production Supabase, SMS, and WeChat OAuth credentials, then enable the already-implemented account flow.
+
+## Follow-up implementation verification
+
+- The website now renders an account and cloud-sync panel, a configured-time browser reminder center, and Day 1, 7, 14, and 30 checkpoint reports with claimable badges.
+- The cloud-auth interface is intentionally configuration-gated: no SMS code, WeChat credential, or server secret is embedded in the browser bundle. The Supabase migration defines authenticated-owner RLS for progress snapshots.
+- The mini-program dashboard now starts from the same four problem entries as the website and exposes the official `wx.requestSubscribeMessage` integration point for approved reminder templates.
+- Browser smoke test: landing to workbench navigation succeeded; account boundary, reminder center, and Day 1 checkpoint were present; the Day 1 badge changed to claimed state; browser console errors were empty.
+- Production DNS check: `newlife30.cn` and `www.newlife30.cn` serve/redirect correctly. The `.com` Nginx redirect is ready and locally verified with Host routing, but its public DNS and TLS certificate remain blocked until the registrar points both `.com` names to the production server.
 
 final result: passed

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Activity,
   Award,
+  Bell,
   BookOpen,
   BriefcaseBusiness,
   Brain,
@@ -14,11 +15,14 @@ import {
   ClipboardSignature,
   Compass,
   Copy,
+  Cloud,
+  CloudUpload,
   Flame,
   Gift,
   Headphones,
   HeartPulse,
   LineChart,
+  LogIn,
   MessageCircle,
   MonitorPlay,
   Moon,
@@ -28,6 +32,7 @@ import {
   Route,
   Save,
   ShieldCheck,
+  Smartphone,
   Sparkles,
   Sunrise,
   Target,
@@ -63,6 +68,17 @@ import {
   systemCourseCatalog,
 } from "./systemCourses.js";
 import { getPreferenceCalibration, getPreferenceMap, preferenceAxisDefinitions, preferenceQuestions } from "./preferenceMap.js";
+import {
+  cloudConfigured,
+  getCloudSession,
+  loadCloudProgress,
+  onCloudAuthChange,
+  saveCloudProgress,
+  sendPhoneOtp,
+  signOutCloud,
+  startWechatLogin,
+  verifyPhoneOtp,
+} from "./cloudSync.js";
 
 const STORAGE_KEY = "life-restart-30-platform-v1";
 const msPerDay = 24 * 60 * 60 * 1000;
@@ -152,6 +168,15 @@ function createDefaultState() {
       },
     },
     outcomeReview: {},
+    cloud: {
+      syncEnabled: false,
+      lastSyncedAt: "",
+    },
+    reminderSettings: {
+      enabled: false,
+      time: "20:45",
+    },
+    reminderLog: {},
     pledgeAccepted: false,
     group: {
       name: "一组",
@@ -208,6 +233,37 @@ const rewardMilestones = [
   { day: 14, title: "节律徽章", body: "两周后，节律开始替代临时意志。" },
   { day: 21, title: "升级徽章", body: "学习和复盘正在变成能力。" },
   { day: 30, title: "重启徽章", body: "你完成了一轮个人运行系统重建。" },
+];
+
+const checkpointMilestones = [
+  {
+    day: 1,
+    badge: "启动见证",
+    title: "Day 1：先让系统真正启动",
+    body: "确认当前问题、完成第一组动作，并写下明天仍愿意回来的理由。",
+    reportPrompt: "我今天决定先改变什么？为什么这件事值得被保护？",
+  },
+  {
+    day: 7,
+    badge: "第一周见证",
+    title: "Day 7：把感受转成可复用的规则",
+    body: "回看第一周最有效的一个动作，找出最容易断线的环节。",
+    reportPrompt: "第一周里，什么动作最值得保留？我下周准备怎样降低断线概率？",
+  },
+  {
+    day: 14,
+    badge: "节律见证",
+    title: "Day 14：让节律开始替代临时意志",
+    body: "确认哪些动作已经进入固定场域，并删掉一个不再必要的负担。",
+    reportPrompt: "我已经形成了什么固定节律？下一阶段只需要继续守住什么？",
+  },
+  {
+    day: 30,
+    badge: "重启结业徽章",
+    title: "Day 30：把改变写进个人运行手册",
+    body: "完成结业复盘、领取重启徽章，并为下一轮 30 天保留一个最小实验。",
+    reportPrompt: "这 30 天最真实的改变是什么？我下一轮只继续哪一个系统？",
+  },
 ];
 
 const resetQuestChapters = [
@@ -734,6 +790,8 @@ function getDailyNextAction({ pledgeAccepted, check, taskDoneCount, taskTotal })
 
 function App() {
   const [state, setState] = useStoredState();
+  const [cloudSession, setCloudSession] = useState(null);
+  const [cloudNotice, setCloudNotice] = useState("");
   const today = getLocalDate();
   const todayDay = clamp(daysBetween(state.startDate, today) + 1, 1, 30);
   const [activeDay, setActiveDay] = useState(todayDay);
@@ -748,6 +806,10 @@ function App() {
   const check = state.checks[activeDay] ?? {};
   const score = calculateScore(state);
   const systemCourseProgress = calculateSystemCourseProgress(state.courseWork);
+  const cloudSnapshot = useMemo(
+    () => JSON.stringify({ ...state, cloud: { ...(state.cloud ?? {}), lastSyncedAt: "" } }),
+    [state]
+  );
   const averageEnergy = useMemo(() => {
     const values = Object.values(state.checks)
       .map((item) => Number(item.energy))
@@ -756,6 +818,72 @@ function App() {
     return Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10;
   }, [state.checks]);
   const streak = calculateStreak(state.checks);
+
+  useEffect(() => {
+    if (!cloudConfigured) return undefined;
+    let mounted = true;
+    getCloudSession()
+      .then((session) => {
+        if (mounted) setCloudSession(session);
+      })
+      .catch((error) => {
+        if (mounted) setCloudNotice(error.message || "账户状态读取失败，请稍后再试。");
+      });
+    const unsubscribe = onCloudAuthChange((session) => {
+      if (mounted) setCloudSession(session);
+    });
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!cloudSession || !state.cloud?.syncEnabled) return undefined;
+    const timer = window.setTimeout(async () => {
+      try {
+        const result = await saveCloudProgress(JSON.parse(cloudSnapshot));
+        if (result?.updatedAt) {
+          setState((current) => ({
+            ...current,
+            cloud: {
+              ...(current.cloud ?? {}),
+              syncEnabled: true,
+              lastSyncedAt: result.updatedAt,
+            },
+          }));
+        }
+      } catch (error) {
+        setCloudNotice(error.message || "云端保存失败，本地记录仍然保留。");
+      }
+    }, 900);
+    return () => window.clearTimeout(timer);
+  }, [cloudSession, cloudSnapshot, setState, state.cloud?.syncEnabled]);
+
+  useEffect(() => {
+    const settings = state.reminderSettings ?? {};
+    if (!settings.enabled || !settings.time || typeof window.Notification === "undefined") return undefined;
+    const notify = () => {
+      if (window.Notification.permission !== "granted") return;
+      const now = new Date();
+      const nowTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      const reminderKey = `${getLocalDate()}-${settings.time}`;
+      if (nowTime !== settings.time || state.reminderLog?.[reminderKey]) return;
+      new window.Notification("NewLife30 今日开启仪式", {
+        body: `Day ${todayDay}：打开平台，完成今天最小的一组动作。`,
+      });
+      setState((current) => ({
+        ...current,
+        reminderLog: {
+          ...(current.reminderLog ?? {}),
+          [reminderKey]: new Date().toISOString(),
+        },
+      }));
+    };
+    notify();
+    const timer = window.setInterval(notify, 60 * 1000);
+    return () => window.clearInterval(timer);
+  }, [setState, state.reminderLog, state.reminderSettings, todayDay]);
 
   const updateCheck = (day, patch) => {
     setState((current) => ({
@@ -768,6 +896,96 @@ function App() {
         },
       },
     }));
+  };
+
+  const enableCloudSync = () => {
+    if (!cloudSession) {
+      setCloudNotice("请先完成手机号或微信登录，再启用跨设备云同步。");
+      return;
+    }
+    setState((current) => ({
+      ...current,
+      cloud: {
+        ...(current.cloud ?? {}),
+        syncEnabled: true,
+      },
+    }));
+    setCloudNotice("云同步已启用：后续记录会自动加密传输并保存到你的账户。");
+  };
+
+  const restoreCloudProgress = async () => {
+    if (!cloudSession) {
+      setCloudNotice("请先登录后再恢复云端记录。");
+      return;
+    }
+    try {
+      const remote = await loadCloudProgress();
+      if (!remote?.snapshot) {
+        setCloudNotice("云端还没有可恢复的记录，当前本地记录不会被覆盖。");
+        return;
+      }
+      const confirmed = window.confirm("恢复云端记录会覆盖当前浏览器中的训练记录，是否继续？");
+      if (!confirmed) return;
+      setState({
+        ...createDefaultState(),
+        ...remote.snapshot,
+        cloud: {
+          ...(remote.snapshot.cloud ?? {}),
+          syncEnabled: true,
+          lastSyncedAt: remote.updated_at ?? new Date().toISOString(),
+        },
+      });
+      setCloudNotice("已恢复云端记录。");
+    } catch (error) {
+      setCloudNotice(error.message || "云端记录恢复失败。");
+    }
+  };
+
+  const handlePhoneOtp = async (phone) => {
+    try {
+      const normalizedPhone = await sendPhoneOtp(phone);
+      setCloudNotice(`验证码已发送至 ${normalizedPhone}。`);
+      return normalizedPhone;
+    } catch (error) {
+      setCloudNotice(error.message || "验证码发送失败。");
+      throw error;
+    }
+  };
+
+  const handleVerifyPhoneOtp = async (phone, token) => {
+    try {
+      const session = await verifyPhoneOtp(phone, token);
+      setCloudSession(session);
+      setCloudNotice("登录成功。现在可以启用云同步，或恢复你的历史记录。");
+    } catch (error) {
+      setCloudNotice(error.message || "验证码校验失败。");
+      throw error;
+    }
+  };
+
+  const handleWechatLogin = () => {
+    try {
+      startWechatLogin();
+    } catch (error) {
+      setCloudNotice(error.message || "微信登录暂时不可用。");
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOutCloud();
+      setCloudSession(null);
+      setState((current) => ({
+        ...current,
+        cloud: {
+          ...(current.cloud ?? {}),
+          syncEnabled: false,
+        },
+      }));
+      setCloudNotice("已退出账户，本地记录仍保留在当前设备。");
+    } catch (error) {
+      setCloudNotice(error.message || "退出账户失败。");
+    }
   };
 
   const updateCourseWork = (courseId, producer) => {
@@ -1141,6 +1359,25 @@ function App() {
         )}
 
         {activeView === "dashboard" && (
+          <AccountCloudPanel
+            configured={cloudConfigured}
+            session={cloudSession}
+            cloud={state.cloud}
+            notice={cloudNotice}
+            onSendPhoneOtp={handlePhoneOtp}
+            onVerifyPhoneOtp={handleVerifyPhoneOtp}
+            onWechatLogin={handleWechatLogin}
+            onEnableSync={enableCloudSync}
+            onRestore={restoreCloudProgress}
+            onSignOut={handleSignOut}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <ReminderCenterPanel state={state} setState={setState} activeDay={activeDay} />
+        )}
+
+        {activeView === "dashboard" && (
           <DailyEngagementPanel
             activeDay={activeDay}
             todayDay={todayDay}
@@ -1151,6 +1388,17 @@ function App() {
             taskDoneCount={taskDoneCount}
             streak={streak}
             updateCheck={updateCheck}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <MilestoneCheckpointPanel
+            activeDay={activeDay}
+            check={check}
+            updateCheck={updateCheck}
+            score={score}
+            streak={streak}
+            averageEnergy={averageEnergy}
           />
         )}
 
@@ -1539,6 +1787,215 @@ function App() {
         )}
       </main>
     </div>
+  );
+}
+
+function AccountCloudPanel({
+  configured,
+  session,
+  cloud,
+  notice,
+  onSendPhoneOtp,
+  onVerifyPhoneOtp,
+  onWechatLogin,
+  onEnableSync,
+  onRestore,
+  onSignOut,
+}) {
+  const [phone, setPhone] = useState("");
+  const [token, setToken] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const sendOtp = async () => {
+    setBusy(true);
+    try {
+      await onSendPhoneOtp(phone);
+      setOtpSent(true);
+    } catch {
+      // The parent panel surfaces the actionable provider error.
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const verifyOtp = async () => {
+    setBusy(true);
+    try {
+      await onVerifyPhoneOtp(phone, token);
+    } catch {
+      // The parent panel surfaces the actionable provider error.
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="panel account-cloud-panel" id="account-cloud">
+      <div className="account-cloud-head">
+        <div>
+          <span className="panel-kicker">ACCOUNT + CLOUD</span>
+          <h2>登录后，把进度带到下一台设备</h2>
+          <p>未登录时，训练记录只保留在当前浏览器。登录后由账户私有空间保存，恢复云端记录前始终要求确认。</p>
+        </div>
+        <span className={configured ? "cloud-status ready" : "cloud-status"}>
+          <Cloud size={16} /> {configured ? (session ? "账户已连接" : "等待登录") : "等待正式配置"}
+        </span>
+      </div>
+
+      {!configured && (
+        <div className="account-config-note">
+          <ShieldCheck size={18} />
+          <p>手机号验证码、微信 OAuth 与云端数据库已预留正式接口；上线前需要填入短信服务、微信 AppID 与服务器端密钥，不会使用演示验证码代替真实登录。</p>
+        </div>
+      )}
+
+      {configured && !session && (
+        <div className="account-login-grid">
+          <label>
+            手机号
+            <input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" placeholder="请输入 11 位手机号" />
+          </label>
+          <button className="account-action" disabled={busy || !phone.trim()} onClick={sendOtp}>
+            <Smartphone size={16} /> {otpSent ? "重新发送验证码" : "发送验证码"}
+          </button>
+          {otpSent && (
+            <>
+              <label>
+                验证码
+                <input value={token} onChange={(event) => setToken(event.target.value)} inputMode="numeric" placeholder="请输入验证码" />
+              </label>
+              <button className="account-action primary" disabled={busy || !token.trim()} onClick={verifyOtp}>
+                <LogIn size={16} /> 验证并登录
+              </button>
+            </>
+          )}
+          <button className="wechat-login" onClick={onWechatLogin}>
+            <MessageCircle size={17} /> 微信登录
+          </button>
+        </div>
+      )}
+
+      {session && (
+        <div className="account-connected-grid">
+          <div>
+            <span>当前账户</span>
+            <strong>{session.user.phone || session.user.email || "已验证用户"}</strong>
+            <p>{cloud?.lastSyncedAt ? `上次云端保存：${new Date(cloud.lastSyncedAt).toLocaleString("zh-CN")}` : "尚未保存任何训练记录"}</p>
+          </div>
+          <button className={cloud?.syncEnabled ? "account-action primary" : "account-action"} onClick={onEnableSync}>
+            <CloudUpload size={16} /> {cloud?.syncEnabled ? "云同步已开启" : "启用云同步"}
+          </button>
+          <button className="account-action" onClick={onRestore}><RefreshCw size={16} /> 恢复云端记录</button>
+          <button className="account-action subtle" onClick={onSignOut}>退出账户</button>
+        </div>
+      )}
+
+      {notice && <p className="account-notice" role="status">{notice}</p>}
+    </section>
+  );
+}
+
+function ReminderCenterPanel({ state, setState, activeDay }) {
+  const settings = state.reminderSettings ?? { enabled: false, time: "20:45" };
+  const canUseNotification = typeof window.Notification !== "undefined";
+  const permission = canUseNotification ? window.Notification.permission : "unsupported";
+
+  const updateSettings = (patch) => {
+    setState((current) => ({
+      ...current,
+      reminderSettings: {
+        ...(current.reminderSettings ?? {}),
+        ...patch,
+      },
+    }));
+  };
+
+  const enableReminder = async () => {
+    if (!canUseNotification) return;
+    const result = permission === "granted" ? "granted" : await window.Notification.requestPermission();
+    if (result === "granted") updateSettings({ enabled: true });
+  };
+
+  const sendTestReminder = () => {
+    if (permission !== "granted") return;
+    new window.Notification("NewLife30 提醒测试", { body: `Day ${activeDay}：现在打开平台，完成今天最小的一组动作。` });
+  };
+
+  return (
+    <section className="panel reminder-center-panel" id="reminder-center">
+      <div className="reminder-copy">
+        <span className="panel-kicker">RETURN RHYTHM</span>
+        <h2>把“明天再做”变成一个准时出现的入口</h2>
+        <p>网页打开时，会在你设定的时间提示今日仪式。小程序端会在用户主动订阅后使用微信订阅消息补充提醒。</p>
+      </div>
+      <div className="reminder-controls">
+        <label>
+          每日提醒时间
+          <input type="time" value={settings.time || "20:45"} onChange={(event) => updateSettings({ time: event.target.value })} />
+        </label>
+        <button className="account-action primary" disabled={!canUseNotification || permission === "denied"} onClick={enableReminder}>
+          <Bell size={16} /> {settings.enabled ? "提醒已开启" : permission === "denied" ? "浏览器已拒绝提醒" : "开启网页提醒"}
+        </button>
+        <button className="account-action" disabled={permission !== "granted"} onClick={sendTestReminder}>发送测试提醒</button>
+      </div>
+    </section>
+  );
+}
+
+function MilestoneCheckpointPanel({ activeDay, check, updateCheck, score, streak, averageEnergy }) {
+  const checkpoint = checkpointMilestones.filter((item) => item.day <= activeDay).at(-1) ?? checkpointMilestones[0];
+  const checkpointDone = Boolean(check.checkpointConfirmed);
+  const report = [
+    `【NewLife30｜Day ${checkpoint.day} 节点报告】`,
+    `节点：${checkpoint.title}`,
+    `连续行动：${streak} 天`,
+    `已完成训练：${score.completedDays}/30`,
+    `平均精力：${averageEnergy ? `${averageEnergy}/5` : "尚未形成趋势"}`,
+    "",
+    "本节点反思：",
+    check.checkpointReflection || "（待填写）",
+    "",
+    `下一步：${checkpoint.reportPrompt}`,
+  ].join("\n");
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(report);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <section className={checkpointDone ? "panel milestone-checkpoint-panel confirmed" : "panel milestone-checkpoint-panel"} id="milestone-checkpoint">
+      <div className="milestone-head">
+        <div>
+          <span>DAY {checkpoint.day} CHECKPOINT</span>
+          <h2>{checkpoint.title}</h2>
+          <p>{checkpoint.body}</p>
+        </div>
+        <div className="milestone-badge"><Award size={19} /> {checkpoint.badge}</div>
+      </div>
+      <div className="milestone-rail">
+        {checkpointMilestones.map((item) => (
+          <span key={item.day} className={activeDay >= item.day ? "reached" : ""}>DAY {item.day}</span>
+        ))}
+      </div>
+      <label className="milestone-reflection">
+        {checkpoint.reportPrompt}
+        <textarea value={check.checkpointReflection ?? ""} onChange={(event) => updateCheck(activeDay, { checkpointReflection: event.target.value })} placeholder="用真实发生过的事情回答，不需要写得完美。" />
+      </label>
+      <div className="milestone-actions">
+        <button className={checkpointDone ? "account-action primary" : "account-action"} onClick={() => updateCheck(activeDay, { checkpointConfirmed: !checkpointDone, checkpointConfirmedAt: new Date().toISOString() })}>
+          <Award size={16} /> {checkpointDone ? "已领取节点徽章" : "确认并领取节点徽章"}
+        </button>
+        <button className="account-action" onClick={copy}><Copy size={16} /> {copied ? "节点报告已复制" : "复制节点报告"}</button>
+      </div>
+    </section>
   );
 }
 

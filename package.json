@@ -12,6 +12,7 @@
     "miniprogram:submit-check": "node scripts/check-miniprogram-submit.cjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.8",
     "@vitejs/plugin-react": "^5.1.0",
     "lucide-react": "^0.556.0",
     "react": "^19.2.1",

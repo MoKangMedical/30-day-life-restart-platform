@@ -15,6 +15,10 @@ function defaultState() {
     courses: {},
     onboarding: {},
     outcomeReview: {},
+    reminderSettings: {
+      subscribed: false,
+      subscribedAt: "",
+    },
     group: {
       name: "一组",
       role: "组员",
@@ -39,6 +43,10 @@ function getState() {
     courses: stored.courses || {},
     onboarding: stored.onboarding || {},
     outcomeReview: stored.outcomeReview || {},
+    reminderSettings: {
+      ...base.reminderSettings,
+      ...(stored.reminderSettings || {}),
+    },
     group: {
       ...base.group,
       ...(stored.group || {}),

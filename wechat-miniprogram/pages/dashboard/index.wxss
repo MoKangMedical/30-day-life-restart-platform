@@ -17,6 +17,68 @@
   border-color: rgba(23, 50, 79, 0.14);
 }
 
+.mini-landing-hero {
+  background: #f5f9ff;
+  border-color: #d7e4f5;
+}
+
+.hero-kicker {
+  display: inline-flex;
+  padding: 8rpx 14rpx;
+  color: #2f68e8;
+  background: #eaf2ff;
+  border: 1rpx solid #c9dcff;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  font-weight: 800;
+}
+
+.quick-entry-list {
+  margin-top: 22rpx;
+  border-top: 1rpx solid #dce7f3;
+}
+
+.quick-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 104rpx;
+  padding: 16rpx 0;
+  text-align: left;
+  border-bottom: 1rpx solid #dce7f3;
+}
+
+.quick-entry.active .quick-entry-title,
+.quick-entry.active .quick-entry-arrow {
+  color: #2f68e8;
+}
+
+.quick-entry-title,
+.quick-entry-body,
+.quick-entry-arrow {
+  display: block;
+}
+
+.quick-entry-title {
+  color: #17324f;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.quick-entry-body {
+  margin-top: 5rpx;
+  color: #74839a;
+  font-size: 22rpx;
+  line-height: 1.45;
+}
+
+.quick-entry-arrow {
+  color: #ef8f9c;
+  font-size: 40rpx;
+  line-height: 1;
+}
+
 .restart-subtitle {
   display: block;
   margin-top: 6rpx;
@@ -434,6 +496,77 @@
   background: #ffffff;
   border: 1rpx solid #e4e9e4;
   border-radius: 16rpx;
+}
+
+.mini-reminder-panel {
+  background: #f7fbff;
+  border-color: #dce7f5;
+}
+
+.reminder-copy {
+  display: block;
+  margin-bottom: 18rpx;
+  color: #586a83;
+  font-size: 24rpx;
+  line-height: 1.65;
+}
+
+.mini-checkpoint-panel {
+  border-color: #dce7f5;
+}
+
+.mini-checkpoint-panel.confirmed {
+  background: #f2fbf5;
+  border-color: #bde3cc;
+}
+
+.checkpoint-label,
+.checkpoint-title,
+.checkpoint-body {
+  display: block;
+}
+
+.checkpoint-label {
+  color: #2f68e8;
+  font-size: 20rpx;
+  font-weight: 800;
+}
+
+.checkpoint-title {
+  margin-top: 9rpx;
+  color: #17324f;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.checkpoint-body {
+  margin-top: 10rpx;
+  color: #586a83;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.checkpoint-rail {
+  display: flex;
+  gap: 10rpx;
+  flex-wrap: wrap;
+  margin: 18rpx 0;
+}
+
+.checkpoint-rail text {
+  padding: 7rpx 12rpx;
+  color: #879190;
+  background: #f6f8f6;
+  border: 1rpx solid #e4e9e4;
+  border-radius: 8rpx;
+  font-size: 21rpx;
+  font-weight: 800;
+}
+
+.checkpoint-rail text.reached {
+  color: #4f8065;
+  background: #edf5ef;
+  border-color: rgba(92, 143, 115, 0.34);
 }
 
 .preview-label {

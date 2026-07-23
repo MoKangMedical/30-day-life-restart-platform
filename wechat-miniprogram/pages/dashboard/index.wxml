@@ -1,18 +1,34 @@
 <view class="page">
-  <view class="hero">
-    <text class="hero-title">30天重建人生体系</text>
-    <text class="hero-subtitle">从今天开始，把身心能量、节律、目标、反馈、学习、关系、价值和身份重新跑起来。</text>
+  <view class="hero mini-landing-hero">
+    <text class="hero-kicker">NEWLIFE30 · 先选问题，再开始训练</text>
+    <text class="hero-title">用 30 天，重建你的人生运行系统</text>
+    <text class="hero-subtitle">不需要先看完全部功能。先选择最真实的卡点，系统会给你一个可以开始的顺序。</text>
+    <view class="quick-entry-list">
+      <button
+        wx:for="{{restartEntryStates}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        class="quick-entry {{onboarding.entryStateId === item.id ? 'active' : ''}}"
+        bindtap="selectRestartState"
+      >
+        <view>
+          <text class="quick-entry-title">{{item.title}}</text>
+          <text class="quick-entry-body">{{item.body}}</text>
+        </view>
+        <text class="quick-entry-arrow">›</text>
+      </button>
+    </view>
   </view>
 
   <view class="panel restart-panel">
     <view class="section-head">
       <view>
-        <text class="section-title">先诊断，再训练</text>
-        <text class="restart-subtitle">从状态失衡走向身份稳定</text>
+        <text class="section-title">补充你的起步路径</text>
+        <text class="restart-subtitle">已选问题后，再匹配更适合的训练节奏</text>
       </view>
       <text class="section-action">第 {{activeDay}} 天</text>
     </view>
-    <text class="restart-copy">先确认你正在经历的真实场景。系统会给出一个更容易开始的顺序，而不是让你同时完成八个系统。</text>
+    <text class="restart-copy">系统会给出一个更容易开始的顺序，而不是让你同时完成八个系统。</text>
 
     <text class="restart-step">01 · 我更接近哪一种状态？</text>
     <view class="restart-profile-grid">
@@ -129,6 +145,25 @@
       <text class="preview-title">Day {{engagement.tomorrow.day}} · {{engagement.tomorrow.title}}</text>
       <text class="preview-body">{{engagement.tomorrow.lesson}}</text>
     </view>
+  </view>
+
+  <view class="panel mini-reminder-panel">
+    <view class="section-head compact">
+      <text class="section-title">明天仍然回来的理由</text>
+      <text class="section-action">{{reminderSettings.subscribed ? '已订阅提醒' : '可选'}}</text>
+    </view>
+    <text class="reminder-copy">开启后，小程序会在 Day 1、7、14、30 等关键节点以及每日训练节奏中，向你请求订阅消息提醒。</text>
+    <button class="ghost-btn" bindtap="requestReminder">{{reminderSettings.subscribed ? '管理订阅提醒' : '开启微信提醒'}}</button>
+  </view>
+
+  <view class="panel mini-checkpoint-panel {{checkpoint.confirmed ? 'confirmed' : ''}}">
+    <text class="checkpoint-label">DAY {{checkpoint.day}} CHECKPOINT</text>
+    <text class="checkpoint-title">{{checkpoint.title}}</text>
+    <text class="checkpoint-body">{{checkpoint.body}}</text>
+    <view class="checkpoint-rail">
+      <text wx:for="{{[1,7,14,30]}}" wx:key="*this" class="{{activeDay >= item ? 'reached' : ''}}">{{item}} 天</text>
+    </view>
+    <button class="primary-btn" bindtap="claimCheckpoint">{{checkpoint.confirmed ? '已领取节点徽章' : '确认并领取节点徽章'}}</button>
   </view>
 
   <view class="metrics">

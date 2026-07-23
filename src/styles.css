@@ -9265,3 +9265,178 @@ body {
   .landing-closing h2 { font-size: 30px; }
   .landing-closing .landing-primary-button { width: auto; }
 }
+
+/* Account, reminders, and milestone checkpoints keep persistence and return cues actionable. */
+.account-cloud-panel,
+.reminder-center-panel,
+.milestone-checkpoint-panel {
+  border-color: #dce6f2;
+}
+
+.account-cloud-head,
+.milestone-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.account-cloud-head h2,
+.reminder-copy h2,
+.milestone-head h2 {
+  margin: 8px 0 0;
+  color: #15233c;
+  font-size: 26px;
+  line-height: 1.3;
+}
+
+.account-cloud-head p,
+.reminder-copy p,
+.milestone-head p,
+.account-config-note p,
+.account-connected-grid p {
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.cloud-status,
+.milestone-badge {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 9px 11px;
+  color: #6f7d90;
+  background: #f4f7fb;
+  border: 1px solid #dfe7f1;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cloud-status.ready,
+.milestone-badge {
+  color: #2367cf;
+  background: #eef5ff;
+  border-color: #c7dcff;
+}
+
+.account-config-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px;
+  margin-top: 20px;
+  color: #3f75c4;
+  background: #f4f8ff;
+  border: 1px solid #d8e6ff;
+  border-radius: 8px;
+}
+
+.account-config-note p { margin: 0; }
+
+.account-login-grid,
+.account-connected-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: 20px;
+}
+
+.account-login-grid label,
+.reminder-controls label,
+.milestone-reflection {
+  display: grid;
+  gap: 7px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.account-login-grid input,
+.reminder-controls input {
+  min-height: 42px;
+  padding: 0 12px;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #d8e2ee;
+  border-radius: 7px;
+  font: inherit;
+}
+
+.account-action,
+.wechat-login {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+  color: #315c99;
+  background: #ffffff;
+  border: 1px solid #cddbf0;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.account-action.primary {
+  color: #ffffff;
+  background: #2f68e8;
+  border-color: #2f68e8;
+}
+
+.account-action.subtle { color: #748399; border-color: #e2e8f0; }
+.account-action:disabled { cursor: not-allowed; opacity: 0.52; }
+.wechat-login { color: #1f8d59; border-color: #bde5ce; background: #f4fcf7; }
+
+.account-login-grid .wechat-login { grid-column: 1 / -1; }
+.account-connected-grid { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.account-connected-grid > div span,
+.account-connected-grid > div strong { display: block; }
+.account-connected-grid > div span { color: #718197; font-size: 12px; }
+.account-connected-grid > div strong { margin-top: 5px; color: #17233d; font-size: 15px; }
+.account-notice { margin: 14px 0 0; color: #2865bf; font-size: 13px; line-height: 1.55; }
+
+.reminder-center-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.8fr);
+  gap: 24px;
+  align-items: end;
+  background: #f8fbff;
+}
+
+.reminder-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.milestone-checkpoint-panel { background: #ffffff; }
+.milestone-checkpoint-panel.confirmed { border-color: #a6d8c2; }
+.milestone-head > div:first-child { max-width: 760px; }
+.milestone-head > div:first-child > span { color: #1f75c8; font-size: 12px; font-weight: 900; }
+.milestone-rail { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+.milestone-rail span { padding: 7px 10px; color: #9aa7b8; background: #f5f7fa; border: 1px solid #e1e7ee; border-radius: 5px; font-size: 11px; font-weight: 900; }
+.milestone-rail span.reached { color: #1c8b5e; background: #effaf4; border-color: #bce4cd; }
+.milestone-reflection textarea { min-height: 110px; padding: 12px; color: #172033; background: #fbfdff; border: 1px solid #d8e2ee; border-radius: 7px; font: inherit; line-height: 1.6; resize: vertical; }
+.milestone-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+@media (max-width: 760px) {
+  .account-cloud-head,
+  .milestone-head { display: grid; gap: 14px; }
+  .account-cloud-head h2,
+  .reminder-copy h2,
+  .milestone-head h2 { font-size: 22px; }
+  .account-login-grid,
+  .account-connected-grid,
+  .reminder-center-panel,
+  .reminder-controls { grid-template-columns: 1fr; }
+  .account-login-grid .account-action,
+  .account-connected-grid .account-action,
+  .reminder-controls .account-action { width: 100%; }
+}

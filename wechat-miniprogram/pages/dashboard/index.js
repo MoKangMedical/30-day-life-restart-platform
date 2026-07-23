@@ -1,5 +1,6 @@
 const { systems, programDays, coreCourses, sleepScoreItems, sleepHomeworkPrompts, kitchenAuditItems } = require("../../utils/data");
 const { getState, patchState, updateCheck, calculateScore, today } = require("../../utils/store");
+const { requestSubscribeReminder, syncProgress } = require("../../utils/cloud");
 
 const msPerDay = 24 * 60 * 60 * 1000;
 
@@ -48,6 +49,13 @@ const rewardMilestones = [
   { day: 14, title: "节律徽章" },
   { day: 21, title: "升级徽章" },
   { day: 30, title: "重启徽章" },
+];
+
+const checkpointMilestones = [
+  { day: 1, title: "启动见证", body: "确认问题，完成第一组动作。" },
+  { day: 7, title: "第一周见证", body: "回看最有效的一条行动规则。" },
+  { day: 14, title: "节律见证", body: "确认已经进入固定场域的动作。" },
+  { day: 30, title: "重启结业徽章", body: "完成结业复盘，写下下一轮实验。" },
 ];
 
 const restartProfiles = [
@@ -224,6 +232,14 @@ function buildRestartRoute(onboarding) {
   };
 }
 
+function buildCheckpoint(activeDay, check) {
+  const current = checkpointMilestones.filter((item) => item.day <= activeDay).pop() || checkpointMilestones[0];
+  return {
+    ...current,
+    confirmed: Boolean(check.checkpointConfirmed),
+  };
+}
+
 Page({
   data: {
     activeDay: 1,
@@ -245,6 +261,8 @@ Page({
     restartProfiles,
     restartEntryStates,
     restartRoute: buildRestartRoute({}),
+    checkpoint: buildCheckpoint(1, {}),
+    reminderSettings: {},
     navItems: [
       { title: "打卡模式", body: "生成每日群发文案", url: "/pages/checkin/index", tab: true },
       { title: "八大系统", body: "查看个人运行系统", url: "/pages/systems/index", tab: true },
@@ -284,6 +302,8 @@ Page({
       kitchenPlan: check.kitchenPlan || {},
       onboarding: state.onboarding || {},
       restartRoute: buildRestartRoute(state.onboarding || {}),
+      checkpoint: buildCheckpoint(activeDay, check),
+      reminderSettings: state.reminderSettings || {},
       score: calculateScore(state, coreCourses, programDays),
     });
   },
@@ -312,6 +332,7 @@ Page({
       kitchenPlan: check.kitchenPlan || {},
       onboarding: state.onboarding || {},
       restartRoute: buildRestartRoute(state.onboarding || {}),
+      checkpoint: buildCheckpoint(activeDay, check),
     });
   },
 
@@ -478,6 +499,38 @@ Page({
       completedAt: new Date().toISOString(),
     });
     wx.showToast({ title: "今日已完成", icon: "success" });
+    syncProgress(getState()).catch(() => {});
+    this.refresh();
+  },
+
+  requestReminder() {
+    requestSubscribeReminder()
+      .then(() => {
+        patchState((state) => ({
+          ...state,
+          reminderSettings: {
+            ...(state.reminderSettings || {}),
+            subscribed: true,
+            subscribedAt: new Date().toISOString(),
+          },
+        }));
+        wx.showToast({ title: "提醒订阅成功", icon: "success" });
+        this.refresh();
+      })
+      .catch((error) => {
+        wx.showToast({ title: error.message || "提醒订阅未完成", icon: "none" });
+      });
+  },
+
+  claimCheckpoint() {
+    updateCheck(this.data.activeDay, {
+      checkpointConfirmed: !this.data.checkpoint.confirmed,
+      checkpointConfirmedAt: new Date().toISOString(),
+    });
+    wx.showToast({
+      title: this.data.checkpoint.confirmed ? "已取消节点确认" : "节点徽章已领取",
+      icon: "success",
+    });
     this.refresh();
   },
 
