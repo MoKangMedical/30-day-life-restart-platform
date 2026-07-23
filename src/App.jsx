@@ -3,6 +3,7 @@ import {
   Activity,
   Award,
   BookOpen,
+  BriefcaseBusiness,
   Brain,
   CalendarDays,
   CheckCircle2,
@@ -10,11 +11,13 @@ import {
   Circle,
   ClipboardCheck,
   ClipboardList,
+  ClipboardSignature,
   Compass,
   Copy,
   Flame,
   Gift,
   Headphones,
+  HeartPulse,
   LineChart,
   MessageCircle,
   MonitorPlay,
@@ -22,6 +25,7 @@ import {
   NotebookPen,
   RefreshCw,
   RotateCcw,
+  Route,
   Save,
   ShieldCheck,
   Sparkles,
@@ -29,7 +33,10 @@ import {
   Target,
   TimerReset,
   Utensils,
+  UserRound,
+  UsersRound,
   WalletCards,
+  Zap,
 } from "lucide-react";
 import {
   commitments,
@@ -45,14 +52,17 @@ import {
   zenCourses,
 } from "./data.js";
 import {
+  academyCohortRhythm,
   academyDelivery,
   academyMethod,
   academyPhases,
   academyStats,
   bookCourseTracks,
+  immersiveCourseCollections,
   lessonContentDetails,
   systemCourseCatalog,
 } from "./systemCourses.js";
+import { getPreferenceCalibration, getPreferenceMap, preferenceAxisDefinitions, preferenceQuestions } from "./preferenceMap.js";
 
 const STORAGE_KEY = "life-restart-30-platform-v1";
 const msPerDay = 24 * 60 * 60 * 1000;
@@ -73,12 +83,14 @@ const iconMap = {
 };
 
 const viewLabels = [
+  { id: "landing", label: "首页" },
   { id: "dashboard", label: "今天要做" },
   { id: "nutrition", label: "睡眠饮食" },
   { id: "courses", label: "系统课程" },
   { id: "learning", label: "学习路径" },
   { id: "group", label: "群内打卡" },
   { id: "systems", label: "八大系统" },
+  { id: "campaign", label: "30天训练营" },
   { id: "theory", label: "为什么练" },
 ];
 
@@ -122,6 +134,24 @@ function createDefaultState() {
     courses: {},
     courseWork: {},
     engagement: {},
+    onboarding: {},
+    preferenceMap: {
+      responses: {},
+      completedAt: "",
+    },
+    goalMap: {
+      outcome: "",
+      meaning: "",
+      dailyAction: "",
+      milestones: {},
+      balance: {
+        energy: 3,
+        focus: 3,
+        relationship: 3,
+        recovery: 3,
+      },
+    },
+    outcomeReview: {},
     pledgeAccepted: false,
     group: {
       name: "一组",
@@ -180,6 +210,22 @@ const rewardMilestones = [
   { day: 30, title: "重启徽章", body: "你完成了一轮个人运行系统重建。" },
 ];
 
+const resetQuestChapters = [
+  { start: 1, end: 7, label: "第一章", title: "稳定底盘", body: "先让身体、承诺和真实记录稳定下来。" },
+  { start: 8, end: 14, label: "第二章", title: "重建节律", body: "把重要动作放进可回归的日周结构。" },
+  { start: 15, end: 21, label: "第三章", title: "升级认知", body: "让学习、表达和反馈开始产生能力。" },
+  { start: 22, end: 28, label: "第四章", title: "形成身份", body: "把价值排序和关系支持整合成长期选择。" },
+  { start: 29, end: 30, label: "终章", title: "写入手册", body: "把有效动作压缩成下一轮可运行的规则。" },
+];
+
+const questLevels = [
+  { level: 1, title: "启程者", minXp: 0, nextXp: 60 },
+  { level: 2, title: "校准者", minXp: 60, nextXp: 160 },
+  { level: 3, title: "践行者", minXp: 160, nextXp: 300 },
+  { level: 4, title: "构建者", minXp: 300, nextXp: 500 },
+  { level: 5, title: "重启者", minXp: 500, nextXp: null },
+];
+
 const promoVideoScenes = [
   {
     title: "打开后先知道今天做什么",
@@ -233,23 +279,23 @@ const academyBoutiqueTracks = [
   {
     label: "Core Studio",
     title: "系统核心课",
-    body: "每个系统 4 节理论课，按问题、模型、案例、作业组织，适合从零建立方法论。",
+    body: "每个系统 4 节精选课，按问题、模型、案例、作业组织；一周只攻一个真实卡点。",
     metric: "8 个系统 · 32 节课",
     target: "lesson-workbench",
   },
   {
     label: "Book Lab",
     title: "书籍转化课",
-    body: "把热门书籍中的模型转成课程作业，不做读书摘抄，只保留可执行训练。",
+    body: "把经典书籍中的模型转成课程作业，不做读书摘抄，只保留能用在当天的训练。",
     metric: "24 节精读转化",
     target: "book-course-library",
   },
   {
-    label: "Daily Lab",
-    title: "日课实验室",
-    body: "每天用打卡、锦囊、徽章和群发作业完成一次小实验，让学习进入真实生活。",
-    metric: "30 天训练闭环",
-    target: "course-action-plan",
+    label: "Cohort Lab",
+    title: "陪跑工作坊",
+    body: "Day 1 定题、Day 2-5 应用、Day 6 互评、Day 7 复盘，让内容、工具和小组只服务一个成果。",
+    metric: "4 个周训练节奏",
+    target: "academy-cohort-rhythm",
   },
 ];
 
@@ -298,6 +344,19 @@ const internationalProductGoals = [
   },
 ];
 
+const fabulousBenchmark = {
+  strengths: [
+    ["理论线索清晰", "从日常场景进入行为改变，降低用户对“自律”的理解门槛。"],
+    ["体验引导轻", "把大目标拆成可开始的小动作，让第一次行动不需要意志力硬撑。"],
+    ["反馈节奏短", "以日常提示、连续完成和微习惯回看，给用户即时的完成感。"],
+  ],
+  gaps: [
+    ["周期闭环较弱", "单点习惯容易开始，但缺少固定 7、14、30 天的训练与复盘节奏。"],
+    ["本土场景有限", "对中国用户的家庭、职场、群体互助和时间现实需要更细的适配。"],
+    ["关系支持不足", "缺少真实同伴的输出、回应与共同完成机制，留存更多依赖个人。"],
+  ],
+};
+
 const userNeedEntries = [
   {
     id: "sleep",
@@ -336,6 +395,121 @@ const userNeedEntries = [
     scrollId: "lesson-workbench",
     systemId: "learning",
     intention: "今天只学一节课，并写下一个可执行动作。",
+  },
+];
+
+const restartProfiles = [
+  {
+    id: "pressure",
+    title: "高压职场人",
+    range: "25-35 岁知识工作者",
+    body: "白天持续输出，晚上停不下来；看起来正常，身体和节奏已经透支。",
+    systems: ["energy", "rhythm", "action", "feedback"],
+    icon: BriefcaseBusiness,
+  },
+  {
+    id: "transition",
+    title: "上升与转型者",
+    range: "22-29 岁职业起步期",
+    body: "不是不努力，而是不知道怎样把焦虑、目标、能力和身份串成一条路。",
+    systems: ["action", "learning", "identity", "rhythm"],
+    icon: Route,
+  },
+  {
+    id: "independent",
+    title: "自由职业者",
+    range: "26-40 岁项目型工作者",
+    body: "自由很多，但结构太少；工作和生活边界不断漂移。",
+    systems: ["rhythm", "action", "value", "relation"],
+    icon: UserRound,
+  },
+  {
+    id: "dualRole",
+    title: "家庭事业双压者",
+    range: "32-42 岁多重角色人群",
+    body: "每天都在处理事情，却越来越难留出恢复、关系和自己的位置。",
+    systems: ["energy", "rhythm", "relation", "identity"],
+    icon: UsersRound,
+  },
+];
+
+const restartEntryStates = [
+  { id: "sleep", title: "睡不好、醒不来", systemId: "energy", body: "先让身体从持续透支回到可恢复状态。" },
+  { id: "chaos", title: "节奏乱、生活失控", systemId: "rhythm", body: "先建立一个可回归的日节奏，而不是塞满计划。" },
+  { id: "stuck", title: "想改变却做不动", systemId: "action", body: "把模糊焦虑压缩成今天可验证的一个动作。" },
+  { id: "lost", title: "方向感弱、学不进去", systemId: "learning", body: "先找到当前值得投入的能力和下一步学习闭环。" },
+];
+
+const resultMilestones = [
+  { day: 7, title: "稳定底盘", body: "你应该开始看见睡眠、精力或日程中一个可复用的改善。" },
+  { day: 14, title: "形成节律", body: "重要动作开始有固定场域，不再每天从零开始选择。" },
+  { day: 30, title: "输出个人系统", body: "带走一份复盘报告和下一轮 30 天的运行方案。" },
+];
+
+const campaignProfiles = [
+  {
+    id: "pressure",
+    tag: "FOR HIGH-PRESSURE WORK",
+    navLabel: "高压职场人",
+    title: "别再拿透支，\n证明你还在努力。",
+    subtitle: "给 25-35 岁高压职场人的 30 天恢复与执行训练",
+    body: "你不需要再学一套效率方法。先让睡眠、精力和工作节奏回到能长期运转的状态，再重新拿回高质量行动。",
+    entryStateId: "sleep",
+    firstSystem: "energy",
+    systemIds: ["energy", "rhythm", "action"],
+    painPoints: ["白天输出不断，晚上大脑停不下来", "任务越来越多，重要事情却持续后移", "周末只剩下恢复，没有真正的生活"],
+    promise: "30 天后，你不会拥有一张更满的日程表，而是一套能在高压下保护恢复与关键行动的工作方式。",
+    milestones: ["Day 7：找到最耗能的一个环节，并建立晚间收束动作", "Day 14：固定一个深度工作窗口和一个恢复窗口", "Day 30：完成个人高压周期运行规则"],
+    ritual: "今天先保护：晚上 22:45 开始收束，不带着工作进入睡眠。",
+    accent: "energy",
+  },
+  {
+    id: "transition",
+    tag: "FOR TRANSITION",
+    navLabel: "上升与转型者",
+    title: "方向不是想清楚的，\n是做出来的。",
+    subtitle: "给职业起步、转型与重新选择的人",
+    body: "当身份还没站稳，最容易把焦虑误认为不够努力。训练营会把“我该怎么办”拆成可验证的目标、能力输入和每日行动。",
+    entryStateId: "stuck",
+    firstSystem: "action",
+    systemIds: ["action", "learning", "identity"],
+    painPoints: ["计划写了很多，却一直没有一个能完成", "信息越看越多，方向反而更模糊", "担心选错路，所以迟迟不敢开始"],
+    promise: "30 天后，你会留下一个可验证目标、一套学习输出机制，以及下一阶段可以继续使用的身份承诺。",
+    milestones: ["Day 7：把一个焦虑转成可验证成果", "Day 14：建立输入、输出、应用、复盘的学习闭环", "Day 30：完成下一轮路径原型与身份宣言"],
+    ritual: "今天先完成：为一个真实目标写下第一个 25 分钟行动。",
+    accent: "action",
+  },
+  {
+    id: "independent",
+    tag: "FOR INDEPENDENT WORK",
+    navLabel: "自由职业者",
+    title: "自由不是没有结构，\n而是自己拥有结构。",
+    subtitle: "给自由职业者、创作者与项目型工作者",
+    body: "当没有组织替你安排节奏时，边界、注意力和资源都会被临时需求吞掉。你需要的不是更狠地逼自己，而是自己的运行系统。",
+    entryStateId: "chaos",
+    firstSystem: "rhythm",
+    systemIds: ["rhythm", "action", "value"],
+    painPoints: ["工作和生活混在一起，随时都像没下班", "项目很多，但没有稳定的推进节奏", "收入与机会波动时，注意力也被拉散"],
+    promise: "30 天后，你会拥有一张可回归的周节奏、一套项目推进机制和一份资源取舍清单。",
+    milestones: ["Day 7：画出真实的能量与工作边界", "Day 14：固定一周的产出、恢复与关系场域", "Day 30：完成个人项目与资源配置规则"],
+    ritual: "今天先划出：一个不被消息打断的 60 分钟工作场域。",
+    accent: "rhythm",
+  },
+  {
+    id: "dualRole",
+    tag: "FOR DUAL RESPONSIBILITY",
+    navLabel: "家庭事业双压者",
+    title: "照顾所有人之前，\n先让自己不被耗尽。",
+    subtitle: "给家庭与职业双重责任中的成年人",
+    body: "你不是时间管理失败，而是长期承担了过多角色。训练营先帮你把恢复、节律、关系和自我位置重新放回生活里。",
+    entryStateId: "sleep",
+    firstSystem: "energy",
+    systemIds: ["energy", "rhythm", "relation"],
+    painPoints: ["每天都在完成责任，却越来越难感觉到自己", "家庭沟通与工作任务相互挤压", "想休息时会内疚，想努力时又没有精力"],
+    promise: "30 天后，你会形成一套更可持续的家庭-工作节律，并拥有一次更清晰、更少消耗的关键沟通方式。",
+    milestones: ["Day 7：保留一个属于自己的恢复动作", "Day 14：建立家庭与工作之间的节律边界", "Day 30：完成关系支持与个人恢复的延续方案"],
+    ritual: "今天先留出：晚餐后 20 分钟，只做恢复，不处理任何责任。",
+    accent: "relation",
   },
 ];
 
@@ -393,19 +567,33 @@ function calculateScore(state) {
   const completedCourses = coreCourses.filter((course) => state.courses[course.id]).length;
   const groupFullDays = programDays.filter((day) => state.checks[day.day]?.groupFullAttendance).length;
   const makeupDays = programDays.filter((day) => state.checks[day.day]?.makeup).length;
+  const completedLessons = systemCourseCatalog.reduce((sum, course) => {
+    const completed = state.courseWork?.[course.id]?.completedLessons ?? {};
+    return sum + course.lessons.filter((_, index) => completed[index]).length;
+  }, 0);
+  const completedBookCourses = Object.entries(bookCourseTracks).reduce((sum, [courseId, courses]) => {
+    const completed = state.courseWork?.[courseId]?.completedBooks ?? {};
+    return sum + courses.filter((course) => completed[course.courseTitle]).length;
+  }, 0);
   const dailyScore = completedDays * 10;
   const courseScore = completedCourses * 20;
+  const lessonScore = completedLessons * 20;
+  const bookScore = completedBookCourses * 15;
   const groupScore = groupFullDays * 30;
 
   return {
     completedDays,
     completedCourses,
+    completedLessons,
+    completedBookCourses,
     dailyScore,
     courseScore,
+    lessonScore,
+    bookScore,
     groupFullDays,
     groupScore,
     makeupDays,
-    totalScore: dailyScore + courseScore + groupScore,
+    totalScore: dailyScore + courseScore + lessonScore + bookScore + groupScore,
   };
 }
 
@@ -440,6 +628,21 @@ function getNextReward(streak) {
 
 function getEarnedRewards(streak) {
   return rewardMilestones.filter((reward) => reward.day <= streak);
+}
+
+function getQuestLevel(totalScore) {
+  const level = [...questLevels].reverse().find((item) => totalScore >= item.minXp) ?? questLevels[0];
+  const range = level.nextXp ? level.nextXp - level.minXp : 1;
+  const progress = level.nextXp ? Math.min(Math.round(((totalScore - level.minXp) / range) * 100), 100) : 100;
+  return {
+    ...level,
+    progress,
+    remaining: level.nextXp ? Math.max(level.nextXp - totalScore, 0) : 0,
+  };
+}
+
+function getResetQuestChapter(activeDay) {
+  return resetQuestChapters.find((chapter) => activeDay >= chapter.start && activeDay <= chapter.end) ?? resetQuestChapters.at(-1);
 }
 
 function buildCheckinMessage(mode, values = {}, activeDay) {
@@ -536,7 +739,7 @@ function App() {
   const [activeDay, setActiveDay] = useState(todayDay);
   const [activeSystemId, setActiveSystemId] = useState(programDays[todayDay - 1].systemId);
   const [activeCourseId, setActiveCourseId] = useState(systemCourseCatalog[0].id);
-  const [activeView, setActiveView] = useState("dashboard");
+  const [activeView, setActiveView] = useState("landing");
   const [pendingScroll, setPendingScroll] = useState(null);
 
   const activeProgram = programDays[activeDay - 1];
@@ -636,6 +839,38 @@ function App() {
     setActiveSystemId(systemId);
     setActiveCourseId(systemId);
     navigateToView(targetView, scrollId);
+  };
+
+  const chooseCampaign = (campaign, targetView = "dashboard") => {
+    setState((current) => ({
+      ...current,
+      onboarding: {
+        ...(current.onboarding ?? {}),
+        campaignId: campaign.id,
+        profileId: campaign.id,
+        entryStateId: campaign.entryStateId,
+      },
+    }));
+    setActiveSystemId(campaign.firstSystem);
+    setActiveCourseId(campaign.firstSystem);
+    navigateToView(targetView, targetView === "dashboard" ? "restart-assessment" : "campaign-hero");
+  };
+
+  const startFromLanding = (entryStateId = "") => {
+    const entry = restartEntryStates.find((item) => item.id === entryStateId);
+    setState((current) => ({
+      ...current,
+      onboarding: {
+        ...(current.onboarding ?? {}),
+        ...(entry ? { entryStateId: entry.id } : {}),
+        landingStartedAt: new Date().toISOString(),
+      },
+    }));
+    if (entry) {
+      setActiveSystemId(entry.systemId);
+      setActiveCourseId(entry.systemId);
+    }
+    navigateToView("dashboard", "restart-assessment");
   };
 
   const toggleCourse = (courseId) => {
@@ -741,8 +976,18 @@ function App() {
     };
   }, []);
 
+  if (activeView === "landing") {
+    return (
+      <LandingHome
+        onStart={startFromLanding}
+        onOpenSystems={() => navigateToView("systems", "system-detail-panel")}
+        onOpenDashboard={() => navigateToView("dashboard", "today-action-panel")}
+      />
+    );
+  }
+
   return (
-    <div className="app">
+    <div className="app report-editorial">
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark">30</div>
@@ -841,6 +1086,14 @@ function App() {
         )}
 
         {activeView === "dashboard" && (
+          <AudienceCampaignPanel
+            campaignId={state.onboarding?.campaignId}
+            onBrowse={() => navigateToView("campaign", "campaign-hero")}
+            onChooseCampaign={chooseCampaign}
+          />
+        )}
+
+        {activeView === "dashboard" && (
           <PromoVideoPanel
             navigateToView={navigateToView}
           />
@@ -857,6 +1110,37 @@ function App() {
         )}
 
         {activeView === "dashboard" && (
+          <RestartAssessmentPanel
+            state={state}
+            setState={setState}
+            activeDay={activeDay}
+            navigateToView={navigateToView}
+            openSystem={openSystem}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <PreferenceMapPanel
+            state={state}
+            setState={setState}
+            activeDay={activeDay}
+            openSystem={openSystem}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <GoalMapPanel
+            state={state}
+            setState={setState}
+            activeDay={activeDay}
+            activeProgram={activeProgram}
+            check={check}
+            updateCheck={updateCheck}
+            navigateToView={navigateToView}
+          />
+        )}
+
+        {activeView === "dashboard" && (
           <DailyEngagementPanel
             activeDay={activeDay}
             todayDay={todayDay}
@@ -867,6 +1151,20 @@ function App() {
             taskDoneCount={taskDoneCount}
             streak={streak}
             updateCheck={updateCheck}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <QuestDrivePanel
+            activeDay={activeDay}
+            activeProgram={activeProgram}
+            check={check}
+            taskDoneCount={taskDoneCount}
+            taskTotal={taskTotal}
+            score={score}
+            systemCourseProgress={systemCourseProgress}
+            streak={streak}
+            navigateToView={navigateToView}
           />
         )}
 
@@ -887,6 +1185,19 @@ function App() {
           <ProgressStats
             score={score}
             todayDay={todayDay}
+            streak={streak}
+            averageEnergy={averageEnergy}
+            systemCourseProgress={systemCourseProgress}
+            navigateToView={navigateToView}
+          />
+        )}
+
+        {activeView === "dashboard" && (
+          <OutcomeLedgerPanel
+            state={state}
+            setState={setState}
+            activeDay={activeDay}
+            score={score}
             streak={streak}
             averageEnergy={averageEnergy}
             systemCourseProgress={systemCourseProgress}
@@ -1007,7 +1318,7 @@ function App() {
           </div>
         )}
 
-        {activeView === "theory" && <TheoryView />}
+        {activeView === "theory" && <TheoryView navigateToView={navigateToView} />}
 
         {activeView === "courses" && (
           <SystemCoursesView
@@ -1016,6 +1327,7 @@ function App() {
             setActiveSystemId={setActiveSystemId}
             courseWork={state.courseWork}
             updateCourseWork={updateCourseWork}
+            navigateToView={navigateToView}
           />
         )}
 
@@ -1127,6 +1439,14 @@ function App() {
               />
             </section>
           </div>
+        )}
+
+        {activeView === "campaign" && (
+          <CampaignLandingView
+            campaignId={state.onboarding?.campaignId}
+            onChooseCampaign={chooseCampaign}
+            openSystem={openSystem}
+          />
         )}
 
         {activeView === "nutrition" && (
@@ -1375,6 +1695,128 @@ function DailyEngagementPanel({
   );
 }
 
+function QuestDrivePanel({
+  activeDay,
+  activeProgram,
+  check,
+  taskDoneCount,
+  taskTotal,
+  score,
+  systemCourseProgress,
+  streak,
+  navigateToView,
+}) {
+  const chapter = getResetQuestChapter(activeDay);
+  const level = getQuestLevel(score.totalScore);
+  const taskPercent = taskTotal ? Math.round((taskDoneCount / taskTotal) * 100) : 0;
+  const reflectionComplete = Boolean(check.output?.trim() && check.reflection?.trim());
+  const quests = [
+    {
+      type: "主线",
+      title: `Day ${activeDay} · ${activeProgram.title}`,
+      body: `${taskDoneCount}/${taskTotal} 个真实动作已完成`,
+      progress: check.completed ? 100 : taskPercent,
+      xp: "+10 XP",
+      complete: Boolean(check.completed),
+      action: () => navigateToView("dashboard", "today-checkin"),
+      actionLabel: check.completed ? "已结算" : "继续任务",
+    },
+    {
+      type: "系统",
+      title: "把知识变成一次行动",
+      body: `${systemCourseProgress.completedLessons}/${systemCourseProgress.totalLessons} 节系统课已完成`,
+      progress: systemCourseProgress.totalLessons
+        ? Math.round((systemCourseProgress.completedLessons / systemCourseProgress.totalLessons) * 100)
+        : 0,
+      xp: "+20 XP",
+      complete: systemCourseProgress.completedLessons > 0,
+      action: () => navigateToView("courses", "lesson-workbench"),
+      actionLabel: "进入课程",
+    },
+    {
+      type: "回声",
+      title: "让同伴看见你的行动",
+      body: check.groupFullAttendance ? "今日小组满勤已记录" : "把一次卡点或有效经验带进小组",
+      progress: check.groupFullAttendance ? 100 : 0,
+      xp: "+30 XP",
+      complete: Boolean(check.groupFullAttendance),
+      action: () => navigateToView("group"),
+      actionLabel: check.groupFullAttendance ? "已结算" : "进入小组",
+    },
+    {
+      type: "复盘",
+      title: "把今天写入下一次选择",
+      body: reflectionComplete ? "输出与复盘已保存" : "完成输出与复盘，让经验可被下一次调用",
+      progress: reflectionComplete ? 100 : 0,
+      xp: "成果条件",
+      complete: reflectionComplete,
+      action: () => navigateToView("dashboard", "today-output"),
+      actionLabel: reflectionComplete ? "已存档" : "去复盘",
+    },
+  ];
+
+  return (
+    <section className="quest-drive-panel" aria-label="重启远征任务系统">
+      <div className="quest-drive-header">
+        <div>
+          <span>NEWLIFE30 QUEST ENGINE</span>
+          <h2>重启远征，不靠刷分通关。</h2>
+          <p>每一点 XP 都来自已经发生的行动、学习或同伴回声；积分只记录证据，不替代真实改变。</p>
+        </div>
+        <div className="quest-chapter-mark">
+          <small>{chapter.label}</small>
+          <strong>{chapter.title}</strong>
+          <p>Day {chapter.start}-{chapter.end}</p>
+        </div>
+      </div>
+
+      <div className="quest-level-panel">
+        <div className="quest-level-copy">
+          <span>当前等级</span>
+          <strong>Lv.{level.level}</strong>
+          <div>
+            <b>{level.title}</b>
+            <p>{chapter.body}</p>
+          </div>
+        </div>
+        <div className="quest-xp-track" aria-label={`经验值 ${score.totalScore} XP`}>
+          <div className="quest-xp-meta">
+            <span>{score.totalScore} XP</span>
+            <span>{level.nextXp ? `距下一等级 ${level.remaining} XP` : "已完成重启旅程"}</span>
+          </div>
+          <div className="quest-xp-bar"><span style={{ width: `${level.progress}%` }} /></div>
+          <small>日课 +10 · 核心课 +20 · 系统课 +20 · 书籍实践 +15 · 小组满勤 +30</small>
+        </div>
+        <div className="quest-streak-mark">
+          <Flame size={19} />
+          <strong>{streak}</strong>
+          <span>连续行动天数</span>
+        </div>
+      </div>
+
+      <div className="quest-card-grid">
+        {quests.map((quest) => (
+          <article key={quest.type} className={quest.complete ? "quest-card complete" : "quest-card"}>
+            <div className="quest-card-top">
+              <span>{quest.type}</span>
+              <em>{quest.xp}</em>
+            </div>
+            <strong>{quest.title}</strong>
+            <p>{quest.body}</p>
+            <div className="quest-card-progress" aria-label={`${quest.title} ${quest.progress}%`}>
+              <span style={{ width: `${quest.progress}%` }} />
+            </div>
+            <button onClick={quest.action}>
+              {quest.complete ? <CheckCircle2 size={15} /> : <Target size={15} />}
+              {quest.actionLabel}
+            </button>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function RetentionEnginePanel({
   activeDay,
   activeProgram,
@@ -1558,6 +2000,265 @@ function UserPathPanel({
   );
 }
 
+function LandingHome({ onStart, onOpenSystems, onOpenDashboard }) {
+  const journeyHighlights = [
+    ["01", "先看见问题", "从睡眠、精力、节律或行动阻力中，确认当下最需要先处理的一件事。", "#f6a11a"],
+    ["02", "再进入 30 天", "每天只做一组可检查任务，配合打卡、复盘和同伴支持，不靠意志硬撑。", "#17a862"],
+    ["03", "留下运行手册", "在 Day 30 回看成果、保留有效规则，并决定下一轮要继续训练什么。", "#326fe6"],
+  ];
+
+  return (
+    <div className="landing-home">
+      <header className="landing-nav">
+        <button className="landing-brand" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="回到 Newlife30 首页">
+          <span><Zap size={23} fill="currentColor" /></span>
+          <strong>NewLife30</strong>
+        </button>
+        <nav aria-label="首页导航">
+          <button onClick={() => scrollToId("landing-concept")}>产品理念</button>
+          <button onClick={() => scrollToId("landing-journey")}>30天路线图</button>
+          <button onClick={() => scrollToId("landing-systems")}>八大系统</button>
+        </nav>
+        <button className="landing-workbench-button" onClick={onOpenDashboard}>进入我的工作台</button>
+      </header>
+
+      <main>
+        <section className="landing-hero" id="landing-concept">
+          <div className="landing-hero-copy">
+            <span className="landing-kicker"><i /> 国内首创闭环式人生重塑平台</span>
+            <h1>用 30 天，<strong>重建你的人生运行系统</strong></h1>
+            <p>融合行为科学、每日打卡、身心记录与社群监督，先稳定节奏，再让行动真正发生。</p>
+            <div className="landing-hero-actions">
+              <button className="landing-primary-button" onClick={() => onStart()}>
+                开启 30 天重塑之旅 <ChevronRight size={19} />
+              </button>
+              <button className="landing-secondary-button" onClick={() => scrollToId("landing-journey")}>
+                <MonitorPlay size={19} /> 查看运作机制
+              </button>
+            </div>
+          </div>
+
+          <div className="landing-problem-panel" aria-label="选择当前最真实的问题">
+            <div className="landing-problem-head">
+              <div><Brain size={22} /></div>
+              <p><strong>从你正在经历的问题开始</strong><span>选择一个，系统只给你当前最需要的起点。</span></p>
+            </div>
+            <div className="landing-problem-list">
+              {restartEntryStates.map((entry) => (
+                <button key={entry.id} onClick={() => onStart(entry.id)}>
+                  <CheckCircle2 size={18} />
+                  <span><strong>{entry.title}</strong><em>{entry.body}</em></span>
+                  <ChevronRight size={17} />
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-journey-section" id="landing-journey">
+          <div className="landing-section-head">
+            <div>
+              <span>NEWLIFE30 JOURNEY MAP</span>
+              <h2>每一步都让用户知道：现在该做什么。</h2>
+            </div>
+            <p>从第一次看见自己卡在哪里，到完成 30 天结业复盘，平台提供行动、记录、同伴与下一步建议。</p>
+          </div>
+          <figure className="landing-journey-poster">
+            <img src={assetPath("/images/newlife30-user-journey-map.png")} alt="NewLife30 用户旅程路线图：从初次听说到 30 天结业与复购转介绍" />
+            <figcaption>用户旅程路线图。训练不是一次性内容消费，而是被看见、被支持、发生行动、留下成果的过程。</figcaption>
+          </figure>
+          <div className="landing-highlight-grid">
+            {journeyHighlights.map(([number, title, body, accent]) => (
+              <article key={number} style={{ "--highlight": accent }}>
+                <span>{number}</span>
+                <strong>{title}</strong>
+                <p>{body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="landing-systems-section" id="landing-systems">
+          <div className="landing-section-head">
+            <div>
+              <span>8 PERSONAL OPERATING SYSTEMS</span>
+              <h2>不是多一张计划表，而是补齐八个运行环节。</h2>
+            </div>
+            <button onClick={onOpenSystems}>查看完整系统图谱 <ChevronRight size={17} /></button>
+          </div>
+          <div className="landing-system-grid">
+            {systems.map((system, index) => {
+              const Icon = iconMap[system.icon];
+              return (
+                <button key={system.id} onClick={onOpenSystems}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <Icon size={20} />
+                  <strong>{system.name}</strong>
+                  <p>{system.content}</p>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="landing-closing">
+          <div>
+            <span>从第一天开始</span>
+            <h2>今天不需要改变全部，只需要开始第一步。</h2>
+          </div>
+          <button className="landing-primary-button" onClick={() => onStart()}>
+            开始我的 30 天 <ChevronRight size={19} />
+          </button>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function AudienceCampaignPanel({ campaignId, onBrowse, onChooseCampaign }) {
+  return (
+    <section className="audience-campaign-panel" aria-label="四类用户的训练营入口">
+      <div className="audience-campaign-head">
+        <div>
+          <span className="panel-kicker">30 DAY FIELD PROGRAMS</span>
+          <h2>不是所有人的重启，都从同一个问题开始。</h2>
+        </div>
+        <button onClick={onBrowse}>查看四类训练营 <ChevronRight size={16} /></button>
+      </div>
+      <div className="audience-campaign-grid">
+        {campaignProfiles.map((campaign, index) => (
+          <article key={campaign.id} className={campaignId === campaign.id ? `audience-campaign-card ${campaign.accent} selected` : `audience-campaign-card ${campaign.accent}`}>
+            <span>{String(index + 1).padStart(2, "0")} · {campaign.tag}</span>
+            <h3>{campaign.title.replace("\n", " ")}</h3>
+            <p>{campaign.subtitle}</p>
+            <button onClick={() => onChooseCampaign(campaign)}>选择这条路径 <ChevronRight size={16} /></button>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CampaignLandingView({ campaignId, onChooseCampaign, openSystem }) {
+  const [activeCampaignId, setActiveCampaignId] = useState(campaignId ?? campaignProfiles[0].id);
+  const campaign = campaignProfiles.find((item) => item.id === activeCampaignId) ?? campaignProfiles[0];
+  const routeSystems = campaign.systemIds
+    .map((systemId) => systems.find((system) => system.id === systemId))
+    .filter(Boolean);
+
+  useEffect(() => {
+    if (campaignId && campaignProfiles.some((item) => item.id === campaignId)) {
+      setActiveCampaignId(campaignId);
+    }
+  }, [campaignId]);
+
+  return (
+    <div className={`campaign-page ${campaign.accent}`}>
+      <section className="campaign-selector" aria-label="选择训练营人群">
+        <span>SELECT YOUR PROGRAM</span>
+        <div>
+          {campaignProfiles.map((item, index) => (
+            <button
+              key={item.id}
+              className={item.id === campaign.id ? "active" : ""}
+              onClick={() => setActiveCampaignId(item.id)}
+            >
+              <small>{String(index + 1).padStart(2, "0")}</small>
+              {item.navLabel}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="campaign-hero" id="campaign-hero">
+        <div className="campaign-hero-copy">
+          <span>{campaign.tag}</span>
+          <h1>{campaign.title.split("\n").map((line) => <React.Fragment key={line}>{line}<br /></React.Fragment>)}</h1>
+          <p className="campaign-subtitle">{campaign.subtitle}</p>
+          <p className="campaign-body">{campaign.body}</p>
+          <div className="campaign-hero-actions">
+            <button className="campaign-primary" onClick={() => onChooseCampaign(campaign)}>
+              从今天开始这 30 天 <ChevronRight size={18} />
+            </button>
+            <button className="campaign-secondary" onClick={() => openSystem(campaign.firstSystem, "systems", "system-detail-panel")}>
+              先看第一个系统
+            </button>
+          </div>
+        </div>
+        <div className="campaign-hero-signal" aria-label="训练营核心信号">
+          <span>30</span>
+          <strong>DAY<br />RESET</strong>
+          <p>{campaign.promise}</p>
+          <em>今日启动句：{campaign.ritual}</em>
+        </div>
+      </section>
+
+      <section className="campaign-section campaign-problem-section">
+        <div className="campaign-section-heading">
+          <span>THIS MAY BE YOU</span>
+          <h2>你不是缺少意志力。<br />你需要一套新的运行方式。</h2>
+        </div>
+        <div className="campaign-pain-list">
+          {campaign.painPoints.map((pain, index) => (
+            <article key={pain}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <p>{pain}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="campaign-section campaign-route-section">
+        <div className="campaign-section-heading">
+          <span>YOUR FIRST THREE SYSTEMS</span>
+          <h2>先恢复，<br />再建立长期能力。</h2>
+        </div>
+        <div className="campaign-system-route">
+          {routeSystems.map((system, index) => {
+            const Icon = iconMap[system.icon];
+            return (
+              <button key={system.id} onClick={() => openSystem(system.id, "systems", "system-detail-panel")}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <Icon size={23} />
+                <strong>{system.name}</strong>
+                <p>{system.value}</p>
+                <em>查看系统 <ChevronRight size={14} /></em>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="campaign-section campaign-milestone-section">
+        <div className="campaign-section-heading">
+          <span>WHAT CHANGES ACROSS 30 DAYS</span>
+          <h2>不是一夜翻盘。<br />是每天把自己拿回来一点。</h2>
+        </div>
+        <div className="campaign-milestone-list">
+          {campaign.milestones.map((milestone, index) => {
+            const [day, body] = milestone.split("：");
+            return (
+              <article key={milestone}>
+                <span>{day}</span>
+                <strong>{body}</strong>
+                <p>{index === 0 ? "先出现一个真实可感的变化。" : index === 1 ? "让重要行为从临时选择变成固定场域。" : "把经历整理为下一阶段仍可使用的规则。"}</p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="campaign-closing">
+        <span>NEWLIFE30</span>
+        <h2>{campaign.promise}</h2>
+        <button onClick={() => onChooseCampaign(campaign)}>
+          选择「{campaign.subtitle}」<ChevronRight size={18} />
+        </button>
+      </section>
+    </div>
+  );
+}
+
 function PromoVideoPanel({ navigateToView }) {
   const [copied, setCopied] = useState(false);
 
@@ -1665,6 +2366,623 @@ function TransformationCompassPanel({ activeDay, check, updateCheck, navigateToV
   );
 }
 
+function RestartAssessmentPanel({ state, setState, activeDay, navigateToView, openSystem }) {
+  const onboarding = state.onboarding ?? {};
+  const selectedProfile = restartProfiles.find((profile) => profile.id === onboarding.profileId);
+  const selectedState = restartEntryStates.find((item) => item.id === onboarding.entryStateId);
+  const recommendedIds = selectedProfile?.systems ?? ["energy", "rhythm", "action"];
+  const orderedIds = selectedState
+    ? [selectedState.systemId, ...recommendedIds.filter((systemId) => systemId !== selectedState.systemId)]
+    : recommendedIds;
+  const recommendedSystems = orderedIds
+    .map((systemId) => systems.find((system) => system.id === systemId))
+    .filter(Boolean);
+
+  const updateOnboarding = (patch) => {
+    setState((current) => ({
+      ...current,
+      onboarding: {
+        ...(current.onboarding ?? {}),
+        ...patch,
+      },
+    }));
+  };
+
+  const startPlan = () => {
+    if (!selectedProfile || !selectedState) return;
+    updateOnboarding({ planStartedAt: new Date().toISOString() });
+    openSystem(recommendedSystems[0].id, "systems", "system-detail-panel");
+  };
+
+  return (
+    <section className="panel restart-assessment-panel" id="restart-assessment">
+      <div className="assessment-intro">
+        <div>
+          <span className="panel-kicker">先诊断，再训练</span>
+          <h2>为现在的你生成 30 天重启路径</h2>
+          <p>
+            Newlife30 面向处于高压与转折中的成人。先确认你正在经历的现实场景，系统只给你当前最需要的起点，而不是一份泛泛的任务清单。
+          </p>
+        </div>
+        <div className="assessment-day-mark">
+          <span>DAY</span>
+          <strong>{String(activeDay).padStart(2, "0")}</strong>
+          <em>当前训练日</em>
+        </div>
+      </div>
+
+      <div className="assessment-step">
+        <div className="assessment-step-head">
+          <span>01</span>
+          <div>
+            <strong>我更接近哪一种真实状态？</strong>
+            <p>不做人格标签，只用来匹配更贴近现实的行动顺序。</p>
+          </div>
+        </div>
+        <div className="profile-choice-grid">
+          {restartProfiles.map((profile) => {
+            const Icon = profile.icon;
+            return (
+              <button
+                key={profile.id}
+                className={onboarding.profileId === profile.id ? "profile-choice active" : "profile-choice"}
+                onClick={() => updateOnboarding({ profileId: profile.id })}
+              >
+                <Icon size={19} />
+                <span>{profile.range}</span>
+                <strong>{profile.title}</strong>
+                <p>{profile.body}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="assessment-step">
+        <div className="assessment-step-head">
+          <span>02</span>
+          <div>
+            <strong>现在最需要先解决什么？</strong>
+            <p>前 7 天先处理高感知痛点：睡不好、节奏乱、做不动或学不进去。</p>
+          </div>
+        </div>
+        <div className="entry-state-list">
+          {restartEntryStates.map((entry) => (
+            <button
+              key={entry.id}
+              className={onboarding.entryStateId === entry.id ? "entry-state-row active" : "entry-state-row"}
+              onClick={() => updateOnboarding({ entryStateId: entry.id })}
+            >
+              <HeartPulse size={18} />
+              <div>
+                <strong>{entry.title}</strong>
+                <p>{entry.body}</p>
+              </div>
+              <ChevronRight size={18} />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={selectedProfile && selectedState ? "personal-route ready" : "personal-route"}>
+        <div>
+          <span>你的优先路径</span>
+          <h3>{selectedProfile && selectedState ? `${selectedProfile.title} · 从 ${selectedState.title} 开始` : "选择上方两项，生成你的起步路径"}</h3>
+          <p>
+            {selectedProfile && selectedState
+              ? "先让身体和生活恢复可运行，再进入长期学习、关系、资源与身份的升级。"
+              : "30 天不是把八个系统同时做完，而是按你当前的难处决定先后顺序。"}
+          </p>
+        </div>
+        <div className="route-system-list">
+          {recommendedSystems.map((system, index) => (
+            <button
+              key={system.id}
+              onClick={() => openSystem(system.id, "systems", "system-detail-panel")}
+              aria-label={`查看${system.name}`}
+            >
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{system.name}</strong>
+            </button>
+          ))}
+        </div>
+        <button className="route-start-button" disabled={!selectedProfile || !selectedState} onClick={startPlan}>
+          <Route size={18} />
+          {onboarding.planStartedAt ? "查看我的重启路径" : "生成并开启我的路径"}
+        </button>
+      </div>
+
+      <div className="assessment-safety">
+        <ShieldCheck size={18} />
+        <p>
+          本平台提供行为与系统重建训练，不替代医疗或心理治疗。若存在急性心理危机、自伤风险、严重失眠或其他需要临床支持的情况，请优先联系专业医疗或心理服务。
+        </p>
+        <button onClick={() => navigateToView("theory", "platform-boundary")}>了解使用边界</button>
+      </div>
+    </section>
+  );
+}
+
+function PreferenceMapPanel({ state, setState, activeDay, openSystem }) {
+  const preferenceState = {
+    responses: {},
+    completedAt: "",
+    ...(state.preferenceMap ?? {}),
+  };
+  const preferenceMap = getPreferenceMap(preferenceState.responses);
+  const calibration = getPreferenceCalibration(preferenceMap, state.checks);
+  const recommendedSystems = preferenceMap.recommendedSystemIds
+    .slice(0, 4)
+    .map((systemId) => systems.find((system) => system.id === systemId))
+    .filter(Boolean);
+  const routeStages = [
+    ["Day 1-7", "先稳定最容易失序的一环"],
+    ["Day 8-14", "建立可回归的行动结构"],
+    ["Day 15-21", "把经验变成能力与反馈"],
+    ["Day 22-30", "写入长期可持续的规则"],
+  ];
+
+  const updateResponse = (questionId, value) => {
+    setState((current) => ({
+      ...current,
+      preferenceMap: {
+        ...(current.preferenceMap ?? {}),
+        responses: {
+          ...(current.preferenceMap?.responses ?? {}),
+          [questionId]: value,
+        },
+        completedAt: "",
+      },
+    }));
+  };
+
+  const completePreferenceMap = () => {
+    if (!preferenceMap.complete) return;
+    setState((current) => ({
+      ...current,
+      preferenceMap: {
+        ...(current.preferenceMap ?? {}),
+        completedAt: new Date().toISOString(),
+      },
+    }));
+  };
+
+  const resetPreferenceMap = () => {
+    setState((current) => ({
+      ...current,
+      preferenceMap: {
+        responses: {},
+        completedAt: "",
+      },
+    }));
+  };
+
+  const openRecommendedCourse = (systemId) => {
+    setState((current) => ({
+      ...current,
+      onboarding: {
+        ...(current.onboarding ?? {}),
+        preferencePathStartedAt: new Date().toISOString(),
+        preferenceStartSystemId: systemId,
+      },
+    }));
+    openSystem(systemId, "courses", "system-course-detail");
+  };
+
+  return (
+    <section className="panel preference-map-panel" id="preference-map">
+      <div className="preference-map-head">
+        <div>
+          <span className="panel-kicker">PERSONAL OPERATING PREFERENCES</span>
+          <h2>找到适合你的开始方式，而不是给你贴标签。</h2>
+          <p>
+            这是一份 Newlife30 自研的行动偏好地图。它只用来调整课程入口、打卡节奏和支持方式，训练后的真实完成与复盘记录会持续校正推荐。
+          </p>
+        </div>
+        <div className="preference-progress-mark" aria-label={`已完成 ${preferenceMap.answeredCount} 题，共 ${preferenceMap.totalQuestions} 题`}>
+          <span>已完成</span>
+          <strong>{preferenceMap.answeredCount}<em>/{preferenceMap.totalQuestions}</em></strong>
+          <small>{preferenceMap.complete ? "可以生成路径" : "按第一反应作答"}</small>
+        </div>
+      </div>
+
+      <div className="preference-boundary">
+        <ShieldCheck size={17} />
+        <p>不是官方 MBTI 测评，不使用 MBTI 题目或类型代码；不用于医疗、心理诊断、招聘或能力判断。</p>
+      </div>
+
+      <div className="preference-axis-list">
+        {preferenceAxisDefinitions.map((axis, axisIndex) => {
+          const axisResult = preferenceMap.axes.find((item) => item.id === axis.id);
+          const questions = preferenceQuestions.filter((question) => question.axisId === axis.id);
+          return (
+            <section className="preference-axis-section" key={axis.id}>
+              <div className="preference-axis-head">
+                <span>{String(axisIndex + 1).padStart(2, "0")}</span>
+                <div>
+                  <strong>{axis.label}</strong>
+                  <p>{axis.low.short} <i>至</i> {axis.high.short}</p>
+                </div>
+                <em>{axisResult?.answered ?? 0}/4</em>
+              </div>
+              <div className="preference-question-list">
+                {questions.map((question, questionIndex) => {
+                  const selected = preferenceState.responses[question.id];
+                  return (
+                    <article className="preference-question" key={question.id}>
+                      <p><span>{String(questionIndex + 1).padStart(2, "0")}</span>{question.prompt}</p>
+                      <div className="preference-options" role="group" aria-label={question.prompt}>
+                        <button
+                          className={selected === "low" ? "active" : ""}
+                          aria-pressed={selected === "low"}
+                          onClick={() => updateResponse(question.id, "low")}
+                        >
+                          {question.low}
+                        </button>
+                        <button
+                          className={selected === "high" ? "active" : ""}
+                          aria-pressed={selected === "high"}
+                          onClick={() => updateResponse(question.id, "high")}
+                        >
+                          {question.high}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+
+      {!preferenceMap.complete && (
+        <div className="preference-incomplete">
+          <Compass size={18} />
+          <span>还差 {preferenceMap.totalQuestions - preferenceMap.answeredCount} 题。完成后生成你的课程顺序与打卡方式。</span>
+        </div>
+      )}
+
+      {preferenceMap.complete && (
+        <section className="preference-result-panel" aria-live="polite">
+          <div className="preference-result-head">
+            <div>
+              <span>你的个人运行偏好图</span>
+              <h3>从 {preferenceMap.axes.map((axis) => axis.profile.short).join(" · ")} 开始训练</h3>
+            </div>
+            <div>
+              <button className="secondary" onClick={resetPreferenceMap}>重新作答</button>
+              <button className="primary-action" onClick={completePreferenceMap}>
+                <CheckCircle2 size={16} />
+                {preferenceState.completedAt ? "偏好图已保存" : "保存我的偏好图"}
+              </button>
+            </div>
+          </div>
+
+          <div className="preference-result-grid">
+            {preferenceMap.axes.map((axis) => (
+              <article key={axis.id}>
+                <span>{axis.label}</span>
+                <strong>{axis.profile.title}</strong>
+                <p>{axis.profile.body}</p>
+                <em>{axis.profile.training}</em>
+              </article>
+            ))}
+          </div>
+
+          <div className="preference-route-block">
+            <div className="preference-route-intro">
+              <span>自适应 30 天课程顺序</span>
+              <h3>优先训练最符合你启动方式的系统。</h3>
+              <p>这是起点顺序，不是对能力的判断。每 7 天由真实完成、状态记录和复盘更新下一阶段建议。</p>
+            </div>
+            <div className="preference-route-grid">
+              {recommendedSystems.map((system, index) => {
+                const course = systemCourseCatalog.find((item) => item.id === system.id);
+                return (
+                  <article key={system.id}>
+                    <span>{routeStages[index]?.[0]}</span>
+                    <strong>{system.name}</strong>
+                    <p>{routeStages[index]?.[1]}</p>
+                    <em>{(preferenceMap.reasons[system.id] ?? []).slice(0, 2).join(" · ")}</em>
+                    <button onClick={() => openRecommendedCourse(system.id)}>
+                      {index === 0 ? "从这里开始" : `进入${course?.courseTitle ?? "系统课程"}`}
+                      <ChevronRight size={15} />
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="preference-calibration">
+            <div>
+              <span>第 {activeDay} 天行为校正</span>
+              <strong>{calibration.status}</strong>
+            </div>
+            <p>{calibration.body}</p>
+          </div>
+        </section>
+      )}
+    </section>
+  );
+}
+
+function GoalMapPanel({ state, setState, activeDay, activeProgram, check, updateCheck, navigateToView }) {
+  const defaultBalance = { energy: 3, focus: 3, relationship: 3, recovery: 3 };
+  const goalMap = {
+    outcome: "",
+    meaning: "",
+    dailyAction: "",
+    milestones: {},
+    ...(state.goalMap ?? {}),
+    balance: { ...defaultBalance, ...(state.goalMap?.balance ?? {}) },
+  };
+  const milestones = [
+    { key: "week1", range: "Day 1-7", title: "稳定底盘", prompt: "这一周结束时，我希望稳定出现的一个变化" },
+    { key: "week2", range: "Day 8-14", title: "建立节律", prompt: "这一周，我要固定下来的一个场域或规则" },
+    { key: "week3", range: "Day 15-21", title: "验证能力", prompt: "这一周，我要用行动验证的一项能力" },
+    { key: "week4", range: "Day 22-30", title: "留下手册", prompt: "30 天结束时，我要保留的一条运行规则" },
+  ];
+  const balanceDimensions = [
+    ["energy", "精力", "身体和情绪是否还有余量"],
+    ["focus", "专注", "重要事情是否得到保护"],
+    ["relationship", "关系", "是否与重要的人保持真实连接"],
+    ["recovery", "恢复", "是否有不被任务侵占的恢复空间"],
+  ];
+  const completedMilestones = milestones.filter((item) => goalMap.milestones?.[item.key]?.trim()).length;
+  const planSignals = [goalMap.outcome, goalMap.meaning, goalMap.dailyAction, completedMilestones === milestones.length].filter(Boolean).length;
+  const planProgress = Math.round((planSignals / 4) * 100);
+  const balanceAverage = Math.round((Object.values(goalMap.balance).reduce((sum, value) => sum + Number(value), 0) / balanceDimensions.length) * 10) / 10;
+
+  const updateGoalMap = (patch) => {
+    setState((current) => ({
+      ...current,
+      goalMap: {
+        ...(current.goalMap ?? {}),
+        ...patch,
+      },
+    }));
+  };
+
+  const updateMilestone = (key, value) => {
+    updateGoalMap({
+      milestones: {
+        ...(goalMap.milestones ?? {}),
+        [key]: value,
+      },
+    });
+  };
+
+  const updateBalance = (key, value) => {
+    updateGoalMap({
+      balance: {
+        ...goalMap.balance,
+        [key]: Number(value),
+      },
+    });
+  };
+
+  const syncDailyAction = () => {
+    const action = goalMap.dailyAction.trim();
+    if (!action) return;
+    updateCheck(activeDay, { intention: action, goalActionSynced: true });
+    navigateToView("dashboard", "daily-ritual");
+  };
+
+  return (
+    <section className="panel goal-map-panel" id="goal-map" aria-label="重启目标地图">
+      <div className="goal-map-head">
+        <div>
+          <span className="panel-kicker">GOAL TO DAILY ACTION</span>
+          <h2>把 30 天愿景，拆成今天能发生的动作。</h2>
+          <p>不是写一张漂亮的目标清单，而是建立成果、里程碑、今日行动和生活平衡之间的可回看连接。</p>
+        </div>
+        <div className="goal-map-readiness">
+          <span>目标清晰度</span>
+          <strong>{planProgress}%</strong>
+          <div><i style={{ width: `${planProgress}%` }} /></div>
+          <small>{planSignals}/4 个关键节点已写下</small>
+        </div>
+      </div>
+
+      <div className="goal-map-intent-grid">
+        <label>
+          30 天后，我要看见什么可验证成果？
+          <textarea
+            value={goalMap.outcome}
+            onChange={(event) => updateGoalMap({ outcome: event.target.value })}
+            placeholder="例：连续 21 天在 23:30 前进入睡前收束，并在上午保持一个 90 分钟深度工作块。"
+          />
+        </label>
+        <label>
+          为什么这个成果值得我持续投入？
+          <textarea
+            value={goalMap.meaning}
+            onChange={(event) => updateGoalMap({ meaning: event.target.value })}
+            placeholder="例：我想先恢复稳定的身体和节奏，不再靠透支换取完成感。"
+          />
+        </label>
+      </div>
+
+      <div className="goal-map-milestones" aria-label="四周里程碑">
+        {milestones.map((milestone) => (
+          <article key={milestone.key} className={goalMap.milestones?.[milestone.key]?.trim() ? "complete" : ""}>
+            <div>
+              <span>{milestone.range}</span>
+              <strong>{milestone.title}</strong>
+            </div>
+            <textarea
+              value={goalMap.milestones?.[milestone.key] ?? ""}
+              onChange={(event) => updateMilestone(milestone.key, event.target.value)}
+              placeholder={milestone.prompt}
+              aria-label={`${milestone.range} ${milestone.title}`}
+            />
+          </article>
+        ))}
+      </div>
+
+      <div className="goal-map-execution-grid">
+        <div className="goal-map-today">
+          <span>DAY {String(activeDay).padStart(2, "0")} · 今日关键动作</span>
+          <strong>{activeProgram.title}</strong>
+          <p>{activeProgram.lesson}</p>
+          <textarea
+            value={goalMap.dailyAction}
+            onChange={(event) => updateGoalMap({ dailyAction: event.target.value })}
+            placeholder={check.intention || "写下一个地点、时间和完成标准明确的最小行动。"}
+          />
+          <button disabled={!goalMap.dailyAction.trim()} onClick={syncDailyAction}>
+            <Target size={16} />
+            同步到今日任务
+          </button>
+        </div>
+        <div className="goal-map-balance">
+          <div className="goal-map-balance-head">
+            <div>
+              <span>生活平衡校准</span>
+              <strong>当前 {balanceAverage}/5</strong>
+            </div>
+            <small>目标不应靠长期透支完成</small>
+          </div>
+          {balanceDimensions.map(([key, label, hint]) => (
+            <label key={key}>
+              <span>{label}<em>{goalMap.balance[key]}/5</em></span>
+              <input type="range" min="1" max="5" value={goalMap.balance[key]} onChange={(event) => updateBalance(key, event.target.value)} />
+              <small>{hint}</small>
+            </label>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function OutcomeLedgerPanel({
+  state,
+  setState,
+  activeDay,
+  score,
+  streak,
+  averageEnergy,
+  systemCourseProgress,
+  navigateToView,
+}) {
+  const [copied, setCopied] = useState(false);
+  const review = state.outcomeReview ?? {};
+  const completedMilestone = resultMilestones.filter((item) => activeDay >= item.day).at(-1);
+  const nextMilestone = resultMilestones.find((item) => activeDay < item.day) ?? resultMilestones[resultMilestones.length - 1];
+  const learningCompleted = systemCourseProgress.completedLessons + systemCourseProgress.completedBookCourses;
+  const reportText = [
+    `【Newlife30｜第 ${activeDay} 天个人运行报告】`,
+    "",
+    `连续行动：${streak} 天`,
+    `完成训练日：${score.completedDays}/30`,
+    `学习完成：${learningCompleted} 项`,
+    `平均精力：${averageEnergy ? `${averageEnergy}/5` : "尚未形成趋势"}`,
+    "",
+    "本阶段最真实的变化：",
+    review.biggestGain || "（待填写）",
+    "",
+    "当前断点：",
+    review.breakPoint || "（待填写）",
+    "",
+    "下一周只保留的微调：",
+    review.nextExperiment || "（待填写）",
+    "",
+    "我不是在追求完美打卡，而是在搭建一套可以持续运行的个人系统。",
+  ].join("\n");
+
+  const updateReview = (key, value) => {
+    setState((current) => ({
+      ...current,
+      outcomeReview: {
+        ...(current.outcomeReview ?? {}),
+        [key]: value,
+      },
+    }));
+  };
+
+  const copyReport = async () => {
+    try {
+      await navigator.clipboard.writeText(reportText);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <section className="panel outcome-ledger-panel" id="outcome-ledger">
+      <div className="outcome-ledger-head">
+        <div>
+          <span className="panel-kicker">把改变变成成果资产</span>
+          <h2>不是多打几次卡，而是留下证据</h2>
+          <p>每周只看三件事：我变好了什么、我卡在哪里、下一周保留哪一个微调。30 天结束时，这些记录会成为你的个人运行报告。</p>
+        </div>
+        <button onClick={() => navigateToView("group")}>去小组复盘 <ChevronRight size={16} /></button>
+      </div>
+
+      <div className="result-rail" aria-label="30 天成果节点">
+        {resultMilestones.map((milestone) => (
+          <article key={milestone.day} className={activeDay >= milestone.day ? "reached" : ""}>
+            <span>DAY {milestone.day}</span>
+            <strong>{milestone.title}</strong>
+            <p>{milestone.body}</p>
+          </article>
+        ))}
+      </div>
+
+      <div className="outcome-evidence-row">
+        <article>
+          <span>行动证据</span>
+          <strong>{score.completedDays}/30</strong>
+          <p>真实完成的训练日</p>
+        </article>
+        <article>
+          <span>连续性</span>
+          <strong>{streak} 天</strong>
+          <p>中断时也允许回归</p>
+        </article>
+        <article>
+          <span>学习转化</span>
+          <strong>{learningCompleted} 项</strong>
+          <p>课程和书籍的行动沉淀</p>
+        </article>
+        <article>
+          <span>下一节点</span>
+          <strong>Day {nextMilestone.day}</strong>
+          <p>{completedMilestone ? `已完成：${completedMilestone.title}` : "从今天的一个动作开始"}</p>
+        </article>
+      </div>
+
+      <div className="outcome-review-grid">
+        <label>
+          本阶段最真实的变化
+          <textarea value={review.biggestGain ?? ""} onChange={(event) => updateReview("biggestGain", event.target.value)} placeholder="例：连续三天 23:30 前放下手机，上午开工更稳定。" />
+        </label>
+        <label>
+          我最需要修正的断点
+          <textarea value={review.breakPoint ?? ""} onChange={(event) => updateReview("breakPoint", event.target.value)} placeholder="例：加班后的晚餐和入睡时间容易失控。" />
+        </label>
+        <label>
+          下一周只保留的微调
+          <textarea value={review.nextExperiment ?? ""} onChange={(event) => updateReview("nextExperiment", event.target.value)} placeholder="例：晚餐后 20 分钟散步，22:45 开始睡前收束。" />
+        </label>
+      </div>
+
+      <div className="outcome-report-preview">
+        <div className="generated-head">
+          <strong><ClipboardSignature size={17} /> 个人运行报告</strong>
+          <button onClick={copyReport}><Copy size={16} />{copied ? "已复制" : "复制报告"}</button>
+        </div>
+        <textarea readOnly value={reportText} aria-label="个人运行报告" />
+      </div>
+    </section>
+  );
+}
+
 const lessonSelfCheckItems = [
   ["problem", "我能说清本节课解决的问题"],
   ["model", "我能用自己的话复述核心模型"],
@@ -1719,7 +3037,14 @@ function buildCourseShareText(course, lessonIndex, work) {
   ].join("\n");
 }
 
-function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemId, courseWork = {}, updateCourseWork }) {
+function SystemCoursesView({
+  activeCourseId,
+  setActiveCourseId,
+  setActiveSystemId,
+  courseWork = {},
+  updateCourseWork,
+  navigateToView,
+}) {
   const activeCourse = systemCourseCatalog.find((course) => course.id === activeCourseId) ?? systemCourseCatalog[0];
   const bookCourses = bookCourseTracks[activeCourse.id] ?? [];
   const activeWork = courseWork[activeCourse.id] ?? {};
@@ -1871,6 +3196,39 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
         </div>
       </section>
 
+      <section id="academy-cohort-rhythm" className="panel academy-cohort-panel">
+        <SectionTitle icon={UsersRound} title="30 天陪跑式课程机制" action="课程、工具、同伴只服务一个成果" />
+        <div className="academy-cohort-intro">
+          <div>
+            <span>NEWLIFE30 COURSE RHYTHM</span>
+            <h3>先完成一周，再升级下一周。</h3>
+          </div>
+          <p>
+            我们保留一站式成长的课程与工具优势，但不让用户淹没在内容里。每周围绕一个具体问题，完成一次学习、应用、反馈和成果回看。
+          </p>
+        </div>
+        <div className="academy-cohort-grid">
+          {academyCohortRhythm.map((stage, index) => (
+            <article key={stage.day} className="academy-cohort-card">
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <em>{stage.day}</em>
+              <strong>{stage.title}</strong>
+              <p>{stage.body}</p>
+              <small>{stage.output}</small>
+            </article>
+          ))}
+        </div>
+        <div className="academy-cohort-actions">
+          <button onClick={() => selectCourse(activeCourse.id, activeLessonIndex, "lesson-workbench")}>
+            从{activeCourse.name}开始
+            <ChevronRight size={16} />
+          </button>
+          <button className="secondary" onClick={() => navigateToView("group")}>
+            进入同伴反馈
+          </button>
+        </div>
+      </section>
+
       <section className="panel academy-curation-panel">
         <SectionTitle icon={Sparkles} title="精品课程陈列" action="像研究院一样组织学习" />
         <div className="academy-curation-grid">
@@ -1882,6 +3240,43 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
               <em>{track.metric}</em>
               <button onClick={() => selectCourse(activeCourse.id, activeLessonIndex, track.target)}>
                 进入模块
+                <ChevronRight size={16} />
+              </button>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel immersive-course-panel">
+        <SectionTitle icon={Headphones} title="全球成长主题引入课" action="自研转化 · 多模态微训练" />
+        <div className="immersive-course-intro">
+          <div>
+            <span>IMMERSIVE INTRODUCTORY SERIES</span>
+            <h3>把高阶成长主题，翻译成今天就能练的一次体验。</h3>
+          </div>
+          <p>
+            这些课程由 Newlife30 按中国用户的生活场景重新编排：每节保留一个模型、一段引导和一个当日动作，
+            并接回八大系统、打卡与小组反馈。课程采用自研内容与公开书目，不转载第三方付费课程材料。
+          </p>
+        </div>
+        <div className="immersive-course-grid">
+          {immersiveCourseCollections.map((collection) => (
+            <article key={collection.id} className="immersive-course-card">
+              <div className="immersive-course-card-head">
+                <span>{collection.label}</span>
+                <em>{collection.duration}</em>
+              </div>
+              <strong>{collection.title}</strong>
+              <p>{collection.body}</p>
+              <div className="immersive-course-flow">
+                {collection.flow.map((step, index) => <span key={step}>{String(index + 1).padStart(2, "0")} {step}</span>)}
+              </div>
+              <div className="immersive-course-action">
+                <small>当日动作</small>
+                <p>{collection.action}</p>
+              </div>
+              <button onClick={() => selectCourse(collection.systemId, collection.lessonIndex, "lesson-workbench")}>
+                进入引入训练
                 <ChevronRight size={16} />
               </button>
             </article>
@@ -2302,9 +3697,75 @@ function SystemCoursesView({ activeCourseId, setActiveCourseId, setActiveSystemI
   );
 }
 
-function TheoryView() {
+function TheoryView({ navigateToView }) {
   return (
     <div className="theory-layout">
+      <section className="benchmark-study-panel theory-wide" aria-label="Fabulous 标杆产品拆解">
+        <header className="benchmark-study-header">
+          <span>04 · 标杆产品拆解</span>
+          <h2>Fabulous</h2>
+        </header>
+        <p className="benchmark-study-summary">
+          以行为科学与游戏化体验切入日常习惯，它证明了“先让人愿意开始”比先讲完整理论更重要。
+          Newlife30 将这一优势延伸为有固定周期、有本土生活场景、有同伴支持的 30 天训练。
+        </p>
+
+        <div className="benchmark-study-grid">
+          <article className="benchmark-product-card">
+            <div className="benchmark-product-mark">
+              <MonitorPlay size={19} />
+              <span>BEHAVIOR DESIGN BENCHMARK</span>
+            </div>
+            <h3>从“愿意打开”到“愿意完成”</h3>
+            <p>Fabulous 的核心启发，是用清晰场景、低门槛动作和短反馈把健康习惯从概念变成可发生的体验。</p>
+            <div className="benchmark-pattern-list" aria-label="可借鉴的行为设计机制">
+              <span>场景化起点</span>
+              <span>微动作引导</span>
+              <span>连续反馈</span>
+            </div>
+            <button onClick={() => navigateToView("dashboard", "daily-ritual")}>
+              看 Newlife30 的每日仪式 <ChevronRight size={16} />
+            </button>
+          </article>
+
+          <article className="benchmark-evidence-card strength">
+            <div>
+              <Sparkles size={19} />
+              <span>可借鉴优势</span>
+            </div>
+            {fabulousBenchmark.strengths.map(([title, body]) => (
+              <p key={title}><strong>{title}</strong>{body}</p>
+            ))}
+          </article>
+
+          <article className="benchmark-evidence-card gap">
+            <div>
+              <Target size={19} />
+              <span>需要补足的部分</span>
+            </div>
+            {fabulousBenchmark.gaps.map(([title, body]) => (
+              <p key={title}><strong>{title}</strong>{body}</p>
+            ))}
+          </article>
+        </div>
+
+        <div className="benchmark-conclusion-grid">
+          <article className="benchmark-insight-card">
+            <span>核心洞察</span>
+            <p>体验可以降低启动门槛，但只有把训练周期、现实场景和复盘机制连成一套系统，习惯才会留下来。</p>
+          </article>
+          <article className="benchmark-opportunity-card">
+            <div>
+              <span>Newlife30 的突破路径</span>
+              <p>把每日仪式、八大系统、7/14/30 天成果节点、群内输出与个人报告串成一个可回归的训练闭环。</p>
+            </div>
+            <button onClick={() => navigateToView("campaign", "campaign-hero")}>
+              查看 30 天训练营 <ChevronRight size={16} />
+            </button>
+          </article>
+        </div>
+      </section>
+
       <section className="panel theory-hero-panel">
         <SectionTitle icon={Brain} title="平台理论总纲" action={courseTheory.source.title} />
         <p className="theory-thesis">{courseTheory.thesis}</p>
@@ -2371,6 +3832,24 @@ function TheoryView() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="panel theory-wide platform-boundary-panel" id="platform-boundary">
+        <SectionTitle icon={ShieldCheck} title="平台使用边界" action="行为训练，不替代专业照护" />
+        <div className="platform-boundary-grid">
+          <article>
+            <strong>平台可以帮助的事</strong>
+            <p>把睡眠、节律、目标、学习和复盘转成更小、更具体、更容易持续的日常动作。</p>
+          </article>
+          <article>
+            <strong>平台不承担的事</strong>
+            <p>不作医疗诊断，不替代医生、心理治疗师或其他持证专业人员的评估和治疗。</p>
+          </article>
+          <article>
+            <strong>优先寻求专业支持的情况</strong>
+            <p>出现急性心理危机、自伤风险、严重睡眠障碍或其他需要临床支持的情况时，请优先联系专业服务。</p>
+          </article>
         </div>
       </section>
 
@@ -2470,9 +3949,9 @@ function ProgressStats({ score, todayDay, streak, averageEnergy, systemCoursePro
         onClick={() => navigateToView("courses", "system-course-detail")}
       />
       <MetricCard
-        label="积分"
+        label="训练 XP"
         value={`${score.totalScore}`}
-        detail={`打卡 ${score.dailyScore} · 课程 ${score.courseScore} · 小组 ${score.groupScore}`}
+        detail={`日课 ${score.dailyScore} · 课程 ${score.courseScore + score.lessonScore + score.bookScore} · 小组 ${score.groupScore}`}
         icon={ClipboardCheck}
         onClick={() => navigateToView("group")}
       />
@@ -2938,7 +4417,7 @@ function GroupFieldView({ state, setState, activeDay, activeDayDate, check, upda
     `小组满勤：${check.groupFullAttendance ? "是，+30" : "否"}`,
     `补打卡使用：${makeupStatus}`,
     "",
-    `个人积分：${score.dailyScore + score.courseScore}`,
+    `个人训练经验：${score.dailyScore + score.courseScore + score.lessonScore + score.bookScore}`,
     `小组加分：${score.groupScore}`,
     `当前总分：${score.totalScore}`,
     "",
@@ -2976,7 +4455,7 @@ function GroupFieldView({ state, setState, activeDay, activeDayDate, check, upda
   return (
     <div className="group-layout">
       <section className="panel group-score-panel">
-        <SectionTitle icon={LineChart} title="积分规则" action="每日 +10 · 作业 +20 · 满勤 +30" />
+        <SectionTitle icon={LineChart} title="XP 结算规则" action="日课 +10 · 系统课 +20 · 满勤 +30" />
         <div className="group-metric-grid">
           <article className="group-stat-card">
             <span>每日打卡</span>
@@ -2984,9 +4463,9 @@ function GroupFieldView({ state, setState, activeDay, activeDayDate, check, upda
             <p>{score.completedDays} 天完成，每天 +10。</p>
           </article>
           <article className="group-stat-card">
-            <span>课程作业</span>
-            <strong>{score.courseScore}</strong>
-            <p>{score.completedCourses} 门核心课，每门 +20。</p>
+            <span>课程训练</span>
+            <strong>{score.courseScore + score.lessonScore + score.bookScore}</strong>
+            <p>{score.completedCourses} 门核心课、{score.completedLessons} 节系统课、{score.completedBookCourses} 节书籍实践。</p>
           </article>
           <article className="group-stat-card">
             <span>小组满勤</span>

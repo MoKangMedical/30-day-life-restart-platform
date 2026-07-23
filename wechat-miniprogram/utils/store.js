@@ -13,6 +13,8 @@ function defaultState() {
     startDate: today(),
     checks: {},
     courses: {},
+    onboarding: {},
+    outcomeReview: {},
     group: {
       name: "一组",
       role: "组员",
@@ -35,6 +37,8 @@ function getState() {
     startDate: stored.startDate || base.startDate,
     checks: stored.checks || {},
     courses: stored.courses || {},
+    onboarding: stored.onboarding || {},
+    outcomeReview: stored.outcomeReview || {},
     group: {
       ...base.group,
       ...(stored.group || {}),

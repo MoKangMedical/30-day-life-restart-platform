@@ -12,6 +12,169 @@
   margin-top: 22rpx;
 }
 
+.restart-panel {
+  background: linear-gradient(135deg, #edf5ef 0%, #ffffff 56%, #f7eee7 100%);
+  border-color: rgba(23, 50, 79, 0.14);
+}
+
+.restart-subtitle {
+  display: block;
+  margin-top: 6rpx;
+  color: #4f8065;
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
+.restart-copy,
+.restart-safety {
+  display: block;
+  color: #4f5c5b;
+  font-size: 24rpx;
+  line-height: 1.65;
+}
+
+.restart-step {
+  display: block;
+  margin-top: 26rpx;
+  color: #17324f;
+  font-size: 25rpx;
+  font-weight: 800;
+}
+
+.restart-profile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.restart-profile {
+  width: calc(50% - 6rpx);
+  min-height: 180rpx;
+  padding: 20rpx;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1rpx solid #e4e9e4;
+  border-radius: 12rpx;
+}
+
+.restart-profile.active {
+  background: #17324f;
+  border-color: #17324f;
+}
+
+.restart-range,
+.restart-title,
+.restart-body {
+  display: block;
+}
+
+.restart-range {
+  color: #4f8065;
+  font-size: 20rpx;
+  font-weight: 800;
+}
+
+.restart-profile.active .restart-range { color: #efe2c8; }
+
+.restart-title {
+  margin-top: 7rpx;
+  color: #17324f;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.restart-profile.active .restart-title { color: #ffffff; }
+
+.restart-body {
+  margin-top: 9rpx;
+  color: #4f5c5b;
+  font-size: 22rpx;
+  line-height: 1.48;
+}
+
+.restart-profile.active .restart-body { color: rgba(255, 255, 255, 0.74); }
+
+.restart-state-list {
+  margin-top: 14rpx;
+}
+
+.restart-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 104rpx;
+  padding: 18rpx;
+  margin-top: 10rpx;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1rpx solid #e4e9e4;
+  border-radius: 12rpx;
+}
+
+.restart-state.active {
+  background: #edf5ef;
+  border-color: rgba(79, 128, 101, 0.5);
+}
+
+.restart-state .restart-title { margin-top: 0; font-size: 26rpx; }
+.restart-state .restart-body { margin-top: 4rpx; }
+.restart-arrow { color: #a35f36; font-size: 42rpx; line-height: 1; }
+
+.restart-route {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  color: #ffffff;
+  background: #7b8581;
+  border-radius: 14rpx;
+}
+
+.restart-route.ready {
+  background: linear-gradient(135deg, #102936, #17324f 58%, #395746);
+}
+
+.restart-route-label,
+.restart-route-title,
+.restart-route-body { display: block; }
+.restart-route-label { color: #efe2c8; font-size: 21rpx; font-weight: 800; }
+.restart-route-title { margin-top: 8rpx; color: #ffffff; font-size: 31rpx; font-weight: 800; line-height: 1.32; }
+.restart-route-body { margin-top: 10rpx; color: rgba(255, 255, 255, 0.75); font-size: 23rpx; line-height: 1.55; }
+
+.restart-system-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 16rpx;
+}
+
+.restart-system {
+  padding: 8rpx 11rpx;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1rpx solid rgba(255, 255, 255, 0.18);
+  border-radius: 8rpx;
+  font-size: 21rpx;
+}
+
+.restart-route-btn {
+  width: 100%;
+  min-height: 76rpx;
+  margin-top: 18rpx;
+  color: #102936;
+  background: #efe2c8;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.restart-safety {
+  margin-top: 18rpx;
+  color: #75807d;
+  font-size: 20rpx;
+}
+
 .engagement-hero {
   display: flex;
   gap: 18rpx;

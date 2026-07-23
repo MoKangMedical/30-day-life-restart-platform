@@ -4,6 +4,61 @@
     <text class="hero-subtitle">从今天开始，把身心能量、节律、目标、反馈、学习、关系、价值和身份重新跑起来。</text>
   </view>
 
+  <view class="panel restart-panel">
+    <view class="section-head">
+      <view>
+        <text class="section-title">先诊断，再训练</text>
+        <text class="restart-subtitle">从状态失衡走向身份稳定</text>
+      </view>
+      <text class="section-action">第 {{activeDay}} 天</text>
+    </view>
+    <text class="restart-copy">先确认你正在经历的真实场景。系统会给出一个更容易开始的顺序，而不是让你同时完成八个系统。</text>
+
+    <text class="restart-step">01 · 我更接近哪一种状态？</text>
+    <view class="restart-profile-grid">
+      <button
+        wx:for="{{restartProfiles}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        class="restart-profile {{onboarding.profileId === item.id ? 'active' : ''}}"
+        bindtap="selectRestartProfile"
+      >
+        <text class="restart-range">{{item.range}}</text>
+        <text class="restart-title">{{item.title}}</text>
+        <text class="restart-body">{{item.body}}</text>
+      </button>
+    </view>
+
+    <text class="restart-step">02 · 我现在最需要先解决什么？</text>
+    <view class="restart-state-list">
+      <button
+        wx:for="{{restartEntryStates}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        class="restart-state {{onboarding.entryStateId === item.id ? 'active' : ''}}"
+        bindtap="selectRestartState"
+      >
+        <view>
+          <text class="restart-title">{{item.title}}</text>
+          <text class="restart-body">{{item.body}}</text>
+        </view>
+        <text class="restart-arrow">›</text>
+      </button>
+    </view>
+
+    <view class="restart-route {{restartRoute.ready ? 'ready' : ''}}">
+      <text class="restart-route-label">我的优先路径</text>
+      <text class="restart-route-title">{{restartRoute.title}}</text>
+      <text class="restart-route-body">{{restartRoute.body}}</text>
+      <view class="restart-system-row">
+        <text wx:for="{{restartRoute.systems}}" wx:key="id" class="restart-system">{{index + 1}} · {{item.name}}</text>
+      </view>
+      <button class="restart-route-btn" bindtap="startRestartRoute">{{restartRoute.ready ? '生成并开启我的路径' : '完成选择后生成路径'}}</button>
+    </view>
+
+    <text class="restart-safety">本平台提供行为与系统重建训练，不替代医疗或心理治疗。存在急性危机、严重失眠等情况时，请优先寻求专业支持。</text>
+  </view>
+
   <view class="panel engagement-panel">
     <view class="section-head">
       <text class="section-title">今日开启仪式</text>

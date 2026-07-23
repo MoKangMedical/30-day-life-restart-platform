@@ -50,6 +50,20 @@ const rewardMilestones = [
   { day: 30, title: "重启徽章" },
 ];
 
+const restartProfiles = [
+  { id: "pressure", title: "高压职场人", range: "25-35 岁知识工作者", body: "白天持续输出，晚上停不下来。", systems: ["energy", "rhythm", "action"] },
+  { id: "transition", title: "上升与转型者", range: "22-29 岁职业起步期", body: "目标很多，但不知道从哪里重启。", systems: ["action", "learning", "identity"] },
+  { id: "independent", title: "自由职业者", range: "26-40 岁项目型工作者", body: "自由很多，但结构太少。", systems: ["rhythm", "action", "value"] },
+  { id: "dualRole", title: "家庭事业双压者", range: "32-42 岁多重角色人群", body: "每天都在处理事情，却没有恢复空间。", systems: ["energy", "rhythm", "relation"] },
+];
+
+const restartEntryStates = [
+  { id: "sleep", title: "睡不好、醒不来", systemId: "energy", body: "先恢复身体底盘。" },
+  { id: "chaos", title: "节奏乱、生活失控", systemId: "rhythm", body: "先建立一个可回归的日节奏。" },
+  { id: "stuck", title: "想改变却做不动", systemId: "action", body: "先把焦虑拆成一个动作。" },
+  { id: "lost", title: "方向感弱、学不进去", systemId: "learning", body: "先建立学习和输出闭环。" },
+];
+
 function dayFromStart(startDate) {
   const [startYear, startMonth, startDay] = String(startDate || today()).split("-").map(Number);
   const [nowYear, nowMonth, nowDay] = today().split("-").map(Number);
@@ -197,6 +211,19 @@ function buildSleepHomeworkRows(check) {
   }));
 }
 
+function buildRestartRoute(onboarding) {
+  const profile = restartProfiles.find((item) => item.id === onboarding.profileId);
+  const entry = restartEntryStates.find((item) => item.id === onboarding.entryStateId);
+  const base = profile ? profile.systems : ["energy", "rhythm", "action"];
+  const ids = entry ? [entry.systemId].concat(base.filter((item) => item !== entry.systemId)) : base;
+  return {
+    ready: Boolean(profile && entry),
+    title: profile && entry ? `${profile.title} · 从${entry.title}开始` : "选择你的状态，生成起步路径",
+    body: profile && entry ? "先处理眼下最痛的状态，再逐步进入长期系统升级。" : "30 天不要求你同时做好八个系统。",
+    systems: ids.map((id) => systems.find((item) => item.id === id)).filter(Boolean),
+  };
+}
+
 Page({
   data: {
     activeDay: 1,
@@ -214,6 +241,10 @@ Page({
     kitchenRows: buildKitchenRows({}),
     kitchenDoneCount: 0,
     kitchenPlan: {},
+    onboarding: {},
+    restartProfiles,
+    restartEntryStates,
+    restartRoute: buildRestartRoute({}),
     navItems: [
       { title: "打卡模式", body: "生成每日群发文案", url: "/pages/checkin/index", tab: true },
       { title: "八大系统", body: "查看个人运行系统", url: "/pages/systems/index", tab: true },
@@ -251,6 +282,8 @@ Page({
       kitchenRows: buildKitchenRows(check),
       kitchenDoneCount: buildKitchenRows(check).filter((item) => item.done).length,
       kitchenPlan: check.kitchenPlan || {},
+      onboarding: state.onboarding || {},
+      restartRoute: buildRestartRoute(state.onboarding || {}),
       score: calculateScore(state, coreCourses, programDays),
     });
   },
@@ -277,6 +310,8 @@ Page({
       kitchenRows: buildKitchenRows(check),
       kitchenDoneCount: buildKitchenRows(check).filter((item) => item.done).length,
       kitchenPlan: check.kitchenPlan || {},
+      onboarding: state.onboarding || {},
+      restartRoute: buildRestartRoute(state.onboarding || {}),
     });
   },
 
@@ -386,6 +421,47 @@ Page({
       },
     });
     this.refresh();
+  },
+
+  selectRestartProfile(event) {
+    const profileId = event.currentTarget.dataset.id;
+    patchState((state) => ({
+      ...state,
+      onboarding: {
+        ...(state.onboarding || {}),
+        profileId,
+      },
+    }));
+    this.refresh();
+  },
+
+  selectRestartState(event) {
+    const entryStateId = event.currentTarget.dataset.id;
+    patchState((state) => ({
+      ...state,
+      onboarding: {
+        ...(state.onboarding || {}),
+        entryStateId,
+      },
+    }));
+    this.refresh();
+  },
+
+  startRestartRoute() {
+    if (!this.data.restartRoute.ready) {
+      wx.showToast({ title: "请先完成两项选择", icon: "none" });
+      return;
+    }
+    patchState((state) => ({
+      ...state,
+      onboarding: {
+        ...(state.onboarding || {}),
+        planStartedAt: new Date().toISOString(),
+      },
+    }));
+    wx.setStorageSync("life-restart-selected-system", this.data.restartRoute.systems[0].id);
+    wx.showToast({ title: "路径已生成", icon: "success" });
+    wx.switchTab({ url: "/pages/systems/index" });
   },
 
   completeDay() {
