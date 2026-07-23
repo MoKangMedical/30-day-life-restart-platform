@@ -2568,9 +2568,22 @@ function UserPathPanel({
 
 function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, onOpenCourses }) {
   const journeyHighlights = [
-    ["01", "先看见问题", "从睡眠、精力、节律或行动阻力中，确认当下最需要先处理的一件事。", "#f6a11a"],
-    ["02", "再进入 30 天", "每天只做一组可检查任务，配合打卡、复盘和同伴支持，不靠意志硬撑。", "#17a862"],
-    ["03", "留下运行手册", "在 Day 30 回看成果、保留有效规则，并决定下一轮要继续训练什么。", "#326fe6"],
+    ["01", "找到起点", "30 秒识别当前最卡的一环，获得第一条具体建议。", "#f2a11a", Target],
+    ["02", "清晰路径", "四个阶段、八个系统，知道此刻练什么、为什么练。", "#3f7bea", Route],
+    ["03", "每日行动", "每天一个最小行动，打卡、记录、反馈都在同一处完成。", "#38a97f", ClipboardCheck],
+    ["04", "复盘进化", "看见自己的变化，保留有效规则，进入下一轮升级。", "#796fd0", RefreshCw],
+  ];
+  const heroStages = [
+    { number: "1", title: "恢复状态", body: "先让自己重新稳定运行", tone: "warm", Icon: HeartPulse },
+    { number: "2", title: "建立行动", body: "把改变转化为今天的动作", tone: "blue", Icon: Target },
+    { number: "3", title: "扩展能力", body: "让认知和关系成为支持", tone: "green", Icon: Brain },
+    { number: "4", title: "形成方向", body: "把资源投入真正重要的事", tone: "violet", Icon: Compass },
+  ];
+  const phaseActions = [
+    ["阶段 1", "恢复状态", "身心能量系统 · 节律秩序系统", "先恢复能量和生活节奏，让自己重新稳定运行。", onOpenSystems, "查看恢复系统"],
+    ["阶段 2", "建立行动", "目标行动系统 · 反馈进化系统", "把模糊感受变成今天能完成的一个动作。", onOpenDashboard, "开始今日行动"],
+    ["阶段 3", "扩展能力", "认知学习系统 · 沟通关系系统", "让学习和关系成为长期成长的支持。", onOpenCourses, "进入精品课程"],
+    ["阶段 4", "形成方向", "价值资源系统 · 身份意义系统", "把时间、资源和选择带回真正重要的方向。", onOpenLearning, "查看30天路径"],
   ];
 
   return (
@@ -2581,9 +2594,11 @@ function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, 
           <strong>NewLife30</strong>
         </button>
         <nav aria-label="首页导航">
-          <button onClick={onOpenLearning}>30天路径</button>
-          <button onClick={onOpenCourses}>精品课程</button>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>首页</button>
+          <button onClick={() => onStart()}>30秒自测</button>
+          <button onClick={() => scrollToId("landing-roadmap")}>重建路线图</button>
           <button onClick={onOpenSystems}>八大系统</button>
+          <button onClick={onOpenDashboard}>行动工具</button>
         </nav>
         <button className="landing-workbench-button" onClick={onOpenDashboard}>继续今天的训练</button>
       </header>
@@ -2591,54 +2606,83 @@ function LandingHome({ onStart, onOpenSystems, onOpenDashboard, onOpenLearning, 
       <main>
         <section className="landing-hero" id="landing-concept">
           <div className="landing-hero-copy">
-            <span className="landing-kicker"><i /> 国内首创闭环式人生重塑平台</span>
-            <h1>用 30 天，<strong>重建你的人生运行系统</strong></h1>
-            <p>融合行为科学、每日打卡、身心记录与社群监督，先稳定节奏，再让行动真正发生。</p>
+            <span className="landing-kicker"><i /> 30天重建人生体系</span>
+            <h1>30天，重新建立<br /><strong>属于你的人生系统</strong></h1>
+            <p>你不需要一次解决所有问题。先找到现在最需要改变的一环，再沿着“恢复状态、建立行动、扩展能力、形成方向”的路径，完成一轮可执行、可记录、可复盘的重建。</p>
             <div className="landing-hero-actions">
               <button className="landing-primary-button" onClick={() => onStart()}>
-                从今天开始 <ChevronRight size={19} />
+                <Compass size={19} /> 开始30秒系统自测
               </button>
-              <button className="landing-secondary-button" onClick={() => scrollToId("landing-journey")}>
-                <MonitorPlay size={19} /> 查看运作机制
+              <button className="landing-secondary-button" onClick={() => scrollToId("landing-roadmap")}>
+                查看完整重建路线 <ChevronRight size={19} />
               </button>
+            </div>
+            <div className="landing-hero-proof" aria-label="平台核心结构">
+              <span><Sparkles size={20} /> 8大人生系统</span>
+              <span><CalendarDays size={20} /> 4个重建阶段</span>
+              <span><RefreshCw size={20} /> 30天行动周期</span>
             </div>
           </div>
 
-          <div className="landing-problem-panel" aria-label="选择当前最真实的问题">
-            <div className="landing-problem-head">
-              <div><Brain size={22} /></div>
-              <p><strong>从你正在经历的问题开始</strong><span>选择一个，系统只给你当前最需要的起点。</span></p>
+          <div className="landing-path-visual" aria-label="四阶段人生重建路径">
+            <div className="landing-path-caption">
+              <span>我的30天重建路径</span>
+              <strong>从此刻，走向<br />稳定的个人系统</strong>
             </div>
-            <div className="landing-problem-list">
-              {restartEntryStates.map((entry) => (
-                <button key={entry.id} onClick={() => onStart(entry.id)}>
-                  <CheckCircle2 size={18} />
-                  <span><strong>{entry.title}</strong><em>{entry.body}</em></span>
-                  <ChevronRight size={17} />
-                </button>
-              ))}
+            <div className="landing-path-orbit" aria-hidden="true" />
+            <div className="landing-path-current">
+              <UserRound size={31} />
+              <span>现在的我</span>
             </div>
+            <div className="landing-path-stage-list">
+              {heroStages.map((stage) => {
+                const StageIcon = stage.Icon;
+                return (
+                  <button key={stage.number} className={`landing-path-stage ${stage.tone}`} onClick={onOpenLearning}>
+                    <span className="landing-path-number">{stage.number}</span>
+                    <StageIcon size={20} />
+                    <strong>{stage.title}</strong>
+                    <em>{stage.body}</em>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="landing-path-goal"><Sparkles size={22} /><span>更稳定的<br />个人系统</span></div>
           </div>
         </section>
 
-        <section className="landing-journey-section" id="landing-journey">
+        <section className="landing-value-section" aria-label="NewLife30 如何帮助用户">
+          <div className="landing-highlight-grid">
+            {journeyHighlights.map(([number, title, body, accent, Icon]) => (
+              <article key={number} style={{ "--highlight": accent }}>
+                <Icon size={27} />
+                <div><span>{number}</span><strong>{title}</strong></div>
+                <p>{body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="landing-roadmap-section" id="landing-roadmap">
           <div className="landing-section-head">
             <div>
-              <span>NEWLIFE30 JOURNEY MAP</span>
-              <h2>每一步都让用户知道：现在该做什么。</h2>
+              <span>MY 30-DAY REBUILD ROADMAP</span>
+              <h2>不是平均用力，而是按阶段解决当前最卡的一环。</h2>
             </div>
-            <p>从第一次看见自己卡在哪里，到完成 30 天结业复盘，平台提供行动、记录、同伴与下一步建议。</p>
+            <p>先恢复状态，再建立行动，然后扩展能力，最后形成稳定方向。八个系统会在最需要的时候出现。</p>
           </div>
-          <figure className="landing-journey-poster">
-            <img src={assetPath("/images/newlife30-user-journey-map.png")} alt="NewLife30 用户旅程路线图：从初次听说到 30 天结业与复购转介绍" />
-            <figcaption>用户旅程路线图。训练不是一次性内容消费，而是被看见、被支持、发生行动、留下成果的过程。</figcaption>
+          <figure className="landing-roadmap-poster">
+            <img src={assetPath("/images/newlife30-30-day-roadmap.png")} alt="我的30天人生重建路线图，展示恢复状态、建立行动、扩展能力、形成方向四个阶段和八个个人运行系统" />
+            <figcaption>先完成系统自测，平台会根据你的当前状态推荐起点；完成 30 天后，生成个人系统报告与下一轮建议。</figcaption>
           </figure>
-          <div className="landing-highlight-grid">
-            {journeyHighlights.map(([number, title, body, accent]) => (
-              <article key={number} style={{ "--highlight": accent }}>
-                <span>{number}</span>
-                <strong>{title}</strong>
+          <div className="landing-phase-grid">
+            {phaseActions.map(([eyebrow, title, systemsText, body, action, actionLabel], index) => (
+              <article key={title} className={`landing-phase-card phase-${index + 1}`}>
+                <span>{eyebrow}</span>
+                <h3>{title}</h3>
+                <strong>{systemsText}</strong>
                 <p>{body}</p>
+                <button onClick={action}>{actionLabel} <ChevronRight size={16} /></button>
               </article>
             ))}
           </div>

@@ -54,4 +54,12 @@ No actionable P0, P1, or P2 findings remain for the requested landing-page direc
 - The today page retains the daily route, check-in, engagement feedback, milestone checkpoint, and task list. Campaigns, media, account, reminders, game mechanics, goal planning, and deeper tools are preserved behind one explicit expandable section.
 - Browser smoke test: direct navigation to `#/today`, `#/path`, `#/courses`, `#/review`, and `#/systems` rendered the matching route title. The main navigation updated the address from `#/today` to `#/path`; the advanced-tools panel opened and exposed reminder and goal tools. Browser console errors: none.
 
+## Homepage Rebuild Route Refresh
+
+- The public homepage now uses the supplied pale blue, high-clarity direction: a concise navigation bar, one self-assessment action, one roadmap action, a readable four-stage visual route, and four visible product promises.
+- The hero route intentionally uses original HTML/CSS components rather than copying the supplied website image. It explains the same product logic: recover state, establish action, expand capability, and form direction.
+- The supplied `我的30天人生重建路线图` is stored at `public/images/newlife30-30-day-roadmap.png` and presented as the formal four-stage, eight-system route asset.
+- Each phase card leads to a real destination: recovery opens systems, action opens today, capability opens courses, and direction opens the 30-day path.
+- Browser verification: the `开始30秒系统自测` button routed to `#/today` and displayed the restart assessment; the roadmap image rendered once; desktop and 390px mobile screenshots showed no title/button overlap; browser console errors were empty.
+
 final result: passed
